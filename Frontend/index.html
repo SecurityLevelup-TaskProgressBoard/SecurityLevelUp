@@ -4,20 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="css/styles.css" />
+    <script src="js/script.js" defer></script>
     <title>Task Progress Manager</title>
 </head>
 <body>
-    <button onclick="NewTaskClicked()">New Task</button>
-    
-    <section class="task-card">
-        <span class="title">Task Title</span>
-        <p class="description">The dog needs to be washed and groomed. Remember to buy new shampoo as well, and to use luke warm water.</p>
-        <section class="bottom-card">
-            <span class="date-created">Date created: [Date]</span>
-            <button class="move-button">
-                Move
-            </button>
-        </section>
+    <section id="new-task-section" >
+        <button class="new-task-button" id="new-task-button" onclick="NewTaskClicked(document.getElementById('new-task-section'))">New Task</button>
     </section>
     
     <section class="board-container">
@@ -28,14 +20,16 @@
                 <h2 class="card-title">A Card Title that is very long and too long actually</h2>
                 <p class="card-description">This is a description of the card. It provides some information about the content of the card.</p>
                 <p class="card-date">Date Created: May 27, 2024</p>
-                <button class="card-button">Move</button>
+                <button class="card-button" id="move_button_1" onclick="MoveButtonClicked(this)">Move</button>
+                <button class="card-button">Delete</button>
             </section>
 
             <section class="card">
-                <h2 class="card-title">Card Title</h2>
+                <h2 class="card-title">Spiderman sighted in brooklyn swinging from webs</h2>
                 <p class="card-description">The dog needs to be washed and groomed. Remember to buy new shampoo as well, and to use luke warm water. The dog needs to be washed and groomed. Remember to buy new shampoo as well, and to use luke warm water.</p>
                 <p class="card-date">Date Created: May 27, 2024</p>
                 <button class="card-button">Move</button>
+                <button class="card-button">Delete</button>
             </section>
 
             <section class="card">
@@ -43,6 +37,7 @@
                 <p class="card-description">This is a description of the card. It provides some information about the content of the card.</p>
                 <p class="card-date">Date Created: May 27, 2024</p>
                 <button class="card-button">Move</button>
+                <button class="card-button">Delete</button>
             </section>
 
             <section class="card">
@@ -50,6 +45,7 @@
                 <p class="card-description">This is a description of the card. It provides some information about the content of the card.</p>
                 <p class="card-date">Date Created: May 27, 2024</p>
                 <button class="card-button">Move</button>
+                <button class="card-button">Delete</button>
             </section>
 
         </section>
@@ -60,6 +56,7 @@
                 <p class="card-description">This is a description of the card. It provides some information about the content of the card.</p>
                 <p class="card-date">Date Created: May 27, 2024</p>
                 <button class="card-button">Move</button>
+                <button class="card-button">Delete</button>
             </section>
 
             <section class="card">
@@ -67,6 +64,7 @@
                 <p class="card-description">The dog needs to be washed and groomed. Remember to buy new shampoo as well, and to use luke warm water. The dog needs to be washed and groomed. Remember to buy new shampoo as well, and to use luke warm water.</p>
                 <p class="card-date">Date Created: May 27, 2024</p>
                 <button class="card-button">Move</button>
+                <button class="card-button">Delete</button>
             </section>
 
         </section>

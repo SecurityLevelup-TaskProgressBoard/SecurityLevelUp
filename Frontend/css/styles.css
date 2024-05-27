@@ -1,7 +1,9 @@
+
+/* Containers */
 .board-container {
     display: flex;
     flex-wrap: nowrap;
-    height : 90vh;
+    height : 75vh;
     margin: auto;
     max-width: 50rem;
 }
@@ -20,6 +22,7 @@
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
   
+/* Container cards */
 .card{
     border: 0.25em;
     border-style: solid;
@@ -33,6 +36,7 @@
     text-align: justify;
     margin-left: 2%;
     margin-right: 2%;
+    overflow: auto;
 }
 
 .card-button{
@@ -46,4 +50,72 @@
     padding: 0.25rem;
     border: none;
     max-height: 2rem;
+}
+
+/* New task components */
+.task-create-container{
+    background-color: #27292d;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    margin: auto;
+    max-width: 50rem;
+    max-height: 10rem;
+    overflow: auto;
+    margin-bottom: 1%;
+    margin-top: 1%;
+}
+ 
+
+.new-task-button {
+    color: #090909;
+    padding: 0.35em 0.7em;
+    font-size: 1rem;
+    border-radius: 0.35em;
+    background: #e8e8e8;
+    cursor: pointer;
+    border: 0.175rem solid #e8e8e8;
+  }
+
+.title-input{
+    display: flex;
+    flex-direction: column;    
+    width: 35%;
+    margin: 1%;
+    margin-bottom: 0.5%;
+    font-size: 0.65rem;
+    border-radius: 0.25rem;
+    color: #555;
+}
+
+.title-input::placeholder {
+    font-size: 0.65rem;
+}
+
+.title-input:focus{
+    border-color: #4383e3;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.35);
+}
+
+.description-input{
+    display: flex;
+    flex-direction: column;    
+    width: 97%;
+    height: 2rem;
+    margin: 1%;
+    margin-top: 0.5%;
+    font-size: 0.65rem;
+    border-radius: 0.25rem;
+    color: #555;
+    overflow: auto;
+    resize: none;
+}
+
+.description-input::placeholder {
+    font-size: 0.65rem;
+}
+
+.description-input:focus{
+    border-color: #4383e3;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.35);
 }
