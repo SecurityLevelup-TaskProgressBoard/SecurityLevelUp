@@ -19,8 +19,8 @@ function loadTasks() {
 }
 
 function buildBoard() {
-    // Clear board if it already exists
-    // TODO
+    // Clear board for when cards already exists
+    destroyBoard();
 
     // Get all titles
     loadTasks();
@@ -62,26 +62,70 @@ function buildBoard() {
         btnEdit.innerText = 'Edit';
         sec.appendChild(btnEdit);
 
-        // Get location of board to load task in
+        // Append the card to the relevant board section via its Status (derived from boardId in Tasks table, then Status in Boards table)
         switch (arrayStatus[index]) {
             case 'ToDo':
-                // append to relevant section here using the to-do ids etc
                 var board = document.getElementById('to-do-board');
                 board.appendChild(sec);
                 break;
             case 'In Progress':
-                // append to relevant section here using the to-do ids etc
                 var board = document.getElementById('in-progress-board');
                 board.appendChild(sec);
                 break;
             case 'Done':
-                // append to relevant section here using the to-do ids etc
                 var board = document.getElementById('done-board');
                 board.appendChild(sec);
                 break;
             default:
                 break;
         }
+    }
+}
+
+function destroyBoard(){
+    var board = document.getElementById('to-do-board');
+    if (board){
+        // Remove board
+        board.remove();
+        // Rebuild board
+        newBoard = document.createElement('section');
+        newBoard.classList.add('board');
+        newBoard.id = 'to-do-board';
+        newBoardHeading = document.createElement('h2');
+        newBoardHeading.classList.add('board-heading');
+        newBoardHeading.innerText = 'ToDo';
+        newBoard.appendChild(newBoardHeading);
+        // Readd board to container
+        var boardContainer = document.getElementById('board-container');
+        boardContainer.appendChild(newBoard);
+    }
+
+    board = document.getElementById('in-progress-board');
+    if (board){
+        board.remove();
+        newBoard = document.createElement('section');
+        newBoard.classList.add('board');
+        newBoard.id = 'in-progress-board';
+        newBoardHeading = document.createElement('h2');
+        newBoardHeading.classList.add('board-heading');
+        newBoardHeading.innerText = 'In Progress';
+        newBoard.appendChild(newBoardHeading);
+        var boardContainer = document.getElementById('board-container');
+        boardContainer.appendChild(newBoard);
+    }
+
+    board = document.getElementById('done-board');
+    if (board){
+        board.remove();
+        newBoard = document.createElement('section');
+        newBoard.classList.add('board');
+        newBoard.id = 'done-board';
+        newBoardHeading = document.createElement('h2');
+        newBoardHeading.classList.add('board-heading');
+        newBoardHeading.innerText = 'Done';
+        newBoard.appendChild(newBoardHeading);
+        var boardContainer = document.getElementById('board-container');
+        boardContainer.appendChild(newBoard);
     }
 }
 

@@ -12,7 +12,7 @@
         <button class="new-task-button" id="new-task-button" onclick="NewTaskClicked(document.getElementById('new-task-section'))">New Task</button>
     </section>
     
-    <section class="board-container">
+    <section id='board-container' class="board-container">
         <section id='to-do-board' class="board">
             <h2 class="board-heading">ToDo</h2>
         </section>
@@ -25,6 +25,9 @@
             <h2 class="board-heading">Done</h2>
         </section>
     </section>
+
+    <button onclick="destroyBoard()">destroy board</button>
+    <button onclick="buildBoard()">build board</button>
 
 </body>
 </html>
