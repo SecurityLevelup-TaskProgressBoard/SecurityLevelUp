@@ -3,8 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="css/styles.css" />
+    <script src="js/script.js" defer></script>
+    <title>Task Progress Manager</title>
 </head>
 <body>
+    <section id="new-task-section" >
+        <button class="new-task-button" id="new-task-button" onclick="NewTaskClicked(document.getElementById('new-task-section'))">New Task</button>
+    </section>
+    
+    <section id='board-container' class="board-container">
+        <section id='to-do-board' class="board">
+            <h2 class="board-heading">ToDo</h2>
+        </section>
+
+        <section id='in-progress-board' class="board">
+            <h2 class="board-heading">In Progress</h2>
+         </section>
+        
+        <section id='done-board' class="board">
+            <h2 class="board-heading">Done</h2>
+        </section>
+    </section>
+
+    <button onclick="destroyBoard()">destroy board</button>
+    <button onclick="buildBoard()">build board</button>
+
 </body>
 </html>
