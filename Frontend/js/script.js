@@ -61,6 +61,7 @@ function buildBoard() {
         btnDelete.classList.add('card-button');
         btnDelete.id = 'delete-button-' + String(userTaskIds[index]);
         btnDelete.innerText = 'Delete';
+        btnDelete.onclick = function() {deleteTask(document.getElementById('card-' + String(userTaskIds[index])));};
         sec.appendChild(btnDelete);
 
         const btnEdit = document.createElement('button');
@@ -95,7 +96,7 @@ function buildBoard() {
 }
 
 function editTask(cardSection){
-    const taskId = cardSection.getAttribute('taskId') | 0; // <-- Convert to int
+    const taskId = cardSection.getAttribute('taskId') | 0;
     
     // Show new task fields
     const newTaskSection = document.getElementById('new-task-section'); 
@@ -105,11 +106,9 @@ function editTask(cardSection){
     }
     // Prepop fields
     const taskTitleField = document.getElementById('title-input');
-    console.log(cardSection.getAttribute('title'));
     taskTitleField.value = cardSection.getAttribute('title');
     const taskDescriptionField = document.getElementById('description-input');
     taskDescriptionField.value = cardSection.getAttribute('description');
-
 }
 
 function moveTask(cardSection){
@@ -156,6 +155,7 @@ function moveTask(cardSection){
 }
 
 function destroyBoard(){
+    // Destroy ToDo board
     var board = document.getElementById('to-do-board');
     if (board){
         // Remove board
@@ -168,11 +168,12 @@ function destroyBoard(){
         newBoardHeading.classList.add('board-heading');
         newBoardHeading.innerText = 'ToDo';
         newBoard.appendChild(newBoardHeading);
-        // Readd board to container
+        // Re-add board to container
         var boardContainer = document.getElementById('board-container');
         boardContainer.appendChild(newBoard);
     }
 
+    // Destroy In Progress board
     board = document.getElementById('in-progress-board');
     if (board){
         board.remove();
@@ -187,6 +188,7 @@ function destroyBoard(){
         boardContainer.appendChild(newBoard);
     }
 
+    // Destroy Done board
     board = document.getElementById('done-board');
     if (board){
         board.remove();
@@ -248,7 +250,34 @@ function NewTaskClicked(section) {
 }
 
 function postTask(){
-    // TODO
-
+    // TODO: POST endpoint to add a new task to the db
+    console.log('Finish up posting new task...');
     // TODO: Put lots of validation in here (like lengths, looking for '--', "'" etc.)
+
+    // TODO: Remember to update the date with todays date
+    const date = getDate();
+    console.log(date);
+}
+
+function deleteTask(cardSection){
+    console.log('Finish up delete code...')
+    const taskId = cardSection.getAttribute('taskId') | 0;
+    // TODO: A PUT method where we just flip the boolean, but will have to think about security though.
+}
+
+function getDate() {
+    const date = new Date();
+    
+    // Get components of the date and time
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');  // Months are 0-based
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    
+    // Format the date and time
+    const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    
+    return formattedDate;
 }
