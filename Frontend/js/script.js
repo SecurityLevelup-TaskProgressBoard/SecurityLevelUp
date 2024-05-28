@@ -9,7 +9,7 @@ var userTitles = ['Card Title', 'Spiderman sighted in brooklyn swinging from web
 var userDescriptions = ['This is a description of the card. It provides some information about the content of the card.', 'The dog needs to be washed and groomed. Remember to buy new shampoo as well, and to use luke warm water. The dog needs to be washed and groomed. Remember to buy new shampoo as well, and to use luke warm water.', 'This is a description of the card. It provides some information about the content of the card.', 'Last descitpion of what happened'];
 var userDates = ['27 May 2024 17:00', '25 May 2024 09:00', '28 May 2024 10:40', '15 May 2024 21:55']
 var userStatus = ['ToDo', 'In Progress', 'Done', 'ToDo'];  // TODO: <-- This needs to be mapped from the int boardId to Status somehow
-var userTaskIds = [1, 2, 3, 4]; 
+var userTaskIds = [1, 2, 3, 4];
 // ***********
 window.onload = () => {
     buildBoard();
@@ -36,11 +36,13 @@ function buildBoard() {
         const title = document.createElement('h2');
         title.classList.add('card-title')
         title.innerText = userTitles[index];
+        sec.setAttribute('title', userTitles[index]);
         sec.appendChild(title);
 
         const description = document.createElement('p');
         description.classList.add('card-description');
         description.innerText = userDescriptions[index];
+        sec.setAttribute('description', userDescriptions[index]);
         sec.appendChild(description);
 
         const date = document.createElement('p');
@@ -65,6 +67,7 @@ function buildBoard() {
         btnEdit.classList.add('card-button');
         btnEdit.id = 'edit-button-' + String(userTaskIds[index]);
         btnEdit.innerText = 'Edit';
+        btnEdit.onclick = function() {editTask(document.getElementById('card-' + String(userTaskIds[index])));};
         sec.appendChild(btnEdit);
 
         // Append the card to the relevant board section via its Status (derived from boardId in Tasks table, then Status in Boards table)
@@ -91,9 +94,26 @@ function buildBoard() {
     }
 }
 
+function editTask(cardSection){
+    const taskId = cardSection.getAttribute('taskId') | 0; // <-- Convert to int
+    
+    // Show new task fields
+    const newTaskSection = document.getElementById('new-task-section'); 
+    // NewTaskClicked(newTaskSection);
+    if (!HasNewTaskBeenClicked) {
+        NewTaskClicked(newTaskSection);
+    }
+    // Prepop fields
+    const taskTitleField = document.getElementById('title-input');
+    console.log(cardSection.getAttribute('title'));
+    taskTitleField.value = cardSection.getAttribute('title');
+    const taskDescriptionField = document.getElementById('description-input');
+    taskDescriptionField.value = cardSection.getAttribute('description');
+
+}
+
 function moveTask(cardSection){
-    console.log(cardSection.getAttribute('boardId'));
-    const taskId = cardSection.getAttribute('taskId') | 0;
+    const taskId = cardSection.getAttribute('taskId') | 0; // <-- Convert to int
     const boardId = cardSection.getAttribute('boardId');
 
     switch (boardId) {
@@ -122,6 +142,7 @@ function moveTask(cardSection){
             // Debug code ********************************
             var indexOfTaskId = userTaskIds.indexOf(taskId);
             userStatus[indexOfTaskId] = 'ToDo';
+
             // ********************************
         break;
         default:
@@ -191,20 +212,29 @@ function NewTaskClicked(section) {
         // Create task title input field
         const inp = document.createElement('input');
         inp.classList.add('title-input');
+        inp.id = 'title-input';
         inp.placeholder = 'Enter task title';
         inp.type = 'text';
         inp.autocomplete = 'off';
         inp.maxLength = '50';
         sec.appendChild(inp);
-        inp.innerText = 'api call...';
 
         // Create task description textarea
         const ta = document.createElement('textarea');
         ta.classList.add('description-input');
+        ta.id = 'description-input';
         ta.placeholder = 'Enter task description';
         ta.type = 'text';
         ta.maxLength = '200';
         sec.appendChild(ta);
+
+        // Create post button
+        const but = document.createElement('button');
+        but.classList.add('card-button');
+        but.innerText = 'Post';
+        but.onclick = postTask;
+        sec.appendChild(but);
+
 
         // Append the above to the section sent through as a parameter
         section.appendChild(sec);
@@ -215,4 +245,10 @@ function NewTaskClicked(section) {
         sec.remove();
         HasNewTaskBeenClicked = 0;
     }
+}
+
+function postTask(){
+    // TODO
+
+    // TODO: Put lots of validation in here (like lengths, looking for '--', "'" etc.)
 }
