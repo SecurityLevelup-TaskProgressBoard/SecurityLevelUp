@@ -1,78 +1,87 @@
 var HasNewTaskBeenClicked = 0;
-var arrayTitles = [];
-var arrayDescriptions = [];
-var arrayDates = [];
-var arrayStatus = [];
-var arrayTaskIds = [];
-
+// var userTitles = [];  // <-- uncomment for when endpoints are done
+// var userDescriptions = [];
+// var userDates = [];
+// var userStatus = [];
+// var userTaskIds = [];
+// DEBUG *******
+var userTitles = ['Card Title', 'Spiderman sighted in brooklyn swinging from webs', 'A Card Title that is very long and too long actually', 'Last One'];
+var userDescriptions = ['This is a description of the card. It provides some information about the content of the card.', 'The dog needs to be washed and groomed. Remember to buy new shampoo as well, and to use luke warm water. The dog needs to be washed and groomed. Remember to buy new shampoo as well, and to use luke warm water.', 'This is a description of the card. It provides some information about the content of the card.', 'Last descitpion of what happened'];
+var userDates = ['27 May 2024 17:00', '25 May 2024 09:00', '28 May 2024 10:40', '15 May 2024 21:55']
+var userStatus = ['ToDo', 'In Progress', 'Done', 'ToDo'];  // TODO: <-- This needs to be mapped from the int boardId to Status somehow
+var userTaskIds = [1, 2, 3, 4]; 
+// ***********
 window.onload = () => {
     buildBoard();
 }
 
 // This will become async once we call the endpoint in here to get all the user's tasks
 function loadTasks() {
-    arrayTitles = ['Card Title', 'Spiderman sighted in brooklyn swinging from webs', 'A Card Title that is very long and too long actually', 'Last One'];
-    arrayDescriptions = ['This is a description of the card. It provides some information about the content of the card.', 'The dog needs to be washed and groomed. Remember to buy new shampoo as well, and to use luke warm water. The dog needs to be washed and groomed. Remember to buy new shampoo as well, and to use luke warm water.', 'This is a description of the card. It provides some information about the content of the card.', 'Last descitpion of what happened'];
-    arrayDates = ['27 May 2024 17:00', '25 May 2024 09:00', '28 May 2024 10:40', '15 May 2024 21:55']
-    arrayStatus = ['ToDo', 'In Progress', 'Done', 'ToDo'];  // <-- This needs to be mapped from the int boardId and Status somehow
-    arrayTaskIds = [1, 2, 3, 4]; 
+    // All this should be dynamically loaded using whichever endpoints. For now the user arrays are hardcoded above.
+    // TODO: call GET method to get all tasks for specific user id. e.g. /api/v1/getTasks/{userId}
+    // The resulting records should all be stored in the user arrays exactly as they are hardcoded above.
 }
 
 function buildBoard() {
     // Clear board for when cards already exists
     destroyBoard();
-
-    // Get all titles
+    // Load all tasks
     loadTasks();
-    for (let index = 0; index < arrayTaskIds.length; index++) {
+    for (let index = 0; index < userTaskIds.length; index++) {
         const sec = document.createElement('section');
         sec.classList.add('card')
-        sec.id = 'card-' + String(arrayTaskIds[index]);  // Will use later when moving and deleting 
+        sec.id = 'card-' + String(userTaskIds[index]);  // Will use later when moving and deleting 
+        sec.setAttribute('taskId', userTaskIds[index]);
 
         const title = document.createElement('h2');
         title.classList.add('card-title')
-        title.innerText = arrayTitles[index];
+        title.innerText = userTitles[index];
         sec.appendChild(title);
 
         const description = document.createElement('p');
         description.classList.add('card-description');
-        description.innerText = arrayDescriptions[index];
+        description.innerText = userDescriptions[index];
         sec.appendChild(description);
 
         const date = document.createElement('p');
         date.classList.add('card-date');
-        date.innerText = arrayDates[index];
+        date.innerText = userDates[index];
         sec.appendChild(date);
 
         const btnMove = document.createElement('button');
         btnMove.classList.add('card-button');
-        btnMove.id = 'move-button-' + String(arrayTaskIds[index]); // This is a bit redundant but might be useful later
-        btnMove.innerText = 'Move';
+        btnMove.id = 'move-button-' + String(userTaskIds[index]); // This is a bit redundant but might be useful later
+        btnMove.innerText = 'Advance';
+        btnMove.onclick = function() {moveTask(document.getElementById('card-' + String(userTaskIds[index])));};
         sec.appendChild(btnMove);
 
         const btnDelete = document.createElement('button');
         btnDelete.classList.add('card-button');
-        btnDelete.id = 'delete-button-' + String(arrayTaskIds[index]);
+        btnDelete.id = 'delete-button-' + String(userTaskIds[index]);
         btnDelete.innerText = 'Delete';
         sec.appendChild(btnDelete);
 
         const btnEdit = document.createElement('button');
         btnEdit.classList.add('card-button');
-        btnEdit.id = 'edit-button-' + String(arrayTaskIds[index]);
+        btnEdit.id = 'edit-button-' + String(userTaskIds[index]);
         btnEdit.innerText = 'Edit';
         sec.appendChild(btnEdit);
 
         // Append the card to the relevant board section via its Status (derived from boardId in Tasks table, then Status in Boards table)
-        switch (arrayStatus[index]) {
+        switch (userStatus[index]) {
             case 'ToDo':
+                sec.setAttribute('boardId', 'ToDo');
                 var board = document.getElementById('to-do-board');
                 board.appendChild(sec);
                 break;
             case 'In Progress':
+                sec.setAttribute('boardId', 'In Progress');
                 var board = document.getElementById('in-progress-board');
                 board.appendChild(sec);
                 break;
             case 'Done':
+                sec.setAttribute('boardId', 'Done');
+                btnMove.innerText = 'Reopen';
                 var board = document.getElementById('done-board');
                 board.appendChild(sec);
                 break;
@@ -80,6 +89,49 @@ function buildBoard() {
                 break;
         }
     }
+}
+
+function moveTask(cardSection){
+    console.log(cardSection.getAttribute('boardId'));
+    const taskId = cardSection.getAttribute('taskId') | 0;
+    const boardId = cardSection.getAttribute('boardId');
+
+    switch (boardId) {
+        case 'ToDo':
+            // Update the boardId in the 'Tasks' table from 1 to 2
+            // TODO: Call endpoint to just update the boardId of the relevant taskId. Something like /api/v1/updateStatus/{taskId}/{newStatus} 
+            
+            // Debug code ********************************
+            var indexOfTaskId = userTaskIds.indexOf(taskId);
+            userStatus[indexOfTaskId] = 'In Progress';
+            // ********************************
+            break;
+        case 'In Progress':
+            // Update the boardId in the 'Tasks' table from 2 to 3
+            // TODO
+            
+            // Debug code ********************************
+            var indexOfTaskId = userTaskIds.indexOf(taskId);
+            userStatus[indexOfTaskId] = 'Done';
+            // ********************************
+            break;
+        case 'Done':
+            // Update the boardId in the 'Tasks' table from 3 to 1
+            // TODO
+            
+            // Debug code ********************************
+            var indexOfTaskId = userTaskIds.indexOf(taskId);
+            userStatus[indexOfTaskId] = 'ToDo';
+            // ********************************
+        break;
+        default:
+            break;
+    }
+
+    // Destroy the board
+    destroyBoard();
+    // Reload the board from the DB with the now updated boardId in the Tasks table (which we did in the switch)
+    buildBoard();
 }
 
 function destroyBoard(){
@@ -129,7 +181,6 @@ function destroyBoard(){
     }
 }
 
-
 function NewTaskClicked(section) {
     if (!HasNewTaskBeenClicked) {
         // Create section
@@ -164,9 +215,4 @@ function NewTaskClicked(section) {
         sec.remove();
         HasNewTaskBeenClicked = 0;
     }
-}
-
-function MoveButtonClicked(button) {
-    var buttonId = button.id;
-    alert('Button ID: ' + (buttonId));
 }
