@@ -1,3 +1,5 @@
+using Server.Services;
+
 namespace Server
 {
 	public class Program
@@ -7,6 +9,8 @@ namespace Server
 			var builder = WebApplication.CreateBuilder(args);
 
 			builder.Services.AddControllers();
+
+			builder.Services.AddScoped<IProgressBoardService, ProgressBoardService>();
 
 			builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwaggerGen();
