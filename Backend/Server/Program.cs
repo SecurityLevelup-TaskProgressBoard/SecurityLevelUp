@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using Server.Context;
 using Server.Services;
 
 namespace Server
@@ -20,6 +22,7 @@ namespace Server
 			builder.Services.AddControllers();
 
 			builder.Services.AddScoped<IProgressBoardService, ProgressBoardService>();
+			builder.Services.AddDbContext<TaskProgressDBContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
 			builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwaggerGen();

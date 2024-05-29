@@ -3,7 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Server.Context
 {
-	public partial class TaskProgressDbContext : DbContext
+	public partial class TaskProgressDBContext : DbContext
 	{
 		private void RegisterDb(DbContextOptionsBuilder optionsBuilder, int retryCount=3)
 		{

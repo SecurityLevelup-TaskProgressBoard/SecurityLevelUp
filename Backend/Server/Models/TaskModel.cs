@@ -1,25 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace Server.Models;
 
 public partial class TaskModel
 {
+    [Key]
     public int TaskId { get; set; }
 
-    public int? UserId { get; set; }
+    public int UserId { get; set; }
 
-    public int? BoardId { get; set; }
+    public int BoardId { get; set; }
 
-    public string? TaskName { get; set; }
+    [StringLength(50)]
+    public string TaskName { get; set; } = null!;
 
-    public string? TaskDescription { get; set; }
+    [StringLength(200)]
+    public string TaskDescription { get; set; } = null!;
 
-    public DateTime? Date { get; set; }
+    [Column(TypeName = "datetime")]
+    public DateTime Date { get; set; }
 
-    public bool? Deleted { get; set; }
+    public bool Deleted { get; set; }
 
-    public virtual Board? Board { get; set; }
+    [ForeignKey("BoardId")]
+    [InverseProperty("Tasks")]
+    public virtual Board Board { get; set; } = null!;
 
-    public virtual User? User { get; set; }
+    [ForeignKey("UserId")]
+    [InverseProperty("Tasks")]
+    public virtual User User { get; set; } = null!;
 }
