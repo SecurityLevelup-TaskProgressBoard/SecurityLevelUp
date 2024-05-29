@@ -1,32 +1,58 @@
 var HasNewTaskBeenClicked = 0;
-// var userTitles = [];  // <-- uncomment for when endpoints are done
-// var userDescriptions = [];
-// var userDates = [];
-// var userStatus = [];
-// var userTaskIds = [];
-// DEBUG *******
-var userTitles = ['Card Title', 'Spiderman sighted in brooklyn swinging from webs', 'A Card Title that is very long and too long actually', 'Last One'];
-var userDescriptions = ['This is a description of the card. It provides some information about the content of the card.', 'The dog needs to be washed and groomed. Remember to buy new shampoo as well, and to use luke warm water. The dog needs to be washed and groomed. Remember to buy new shampoo as well, and to use luke warm water.', 'This is a description of the card. It provides some information about the content of the card.', 'Last descitpion of what happened'];
-var userDates = ['27 May 2024 17:00', '25 May 2024 09:00', '28 May 2024 10:40', '15 May 2024 21:55']
-var userStatus = ['ToDo', 'In Progress', 'Done', 'ToDo'];  // TODO: <-- This needs to be mapped from the int boardId to Status somehow
-var userTaskIds = [1, 2, 3, 4];
-// ***********
-window.onload = () => {
-    buildBoard();
+let userTitles = []
+let userDescriptions = []
+let userDates = []
+let userStatus = []
+let userTaskIds = []
+
+window.onload = async () => {
+    await buildBoard();
+}
+
+const backendURL = "https://localhost:7033/"
+
+async function fetchWithAuth(endpoint, options={}){
+    const headers = new Headers(options.headers || {});
+    let url = backendURL + endpoint;
+    let result=  await fetch(url, {
+        ...options,
+        headers,
+      });
+      if (result.status==401) { alert("Error in calling BE");}
+      else return result;
 }
 
 // This will become async once we call the endpoint in here to get all the user's tasks
-function loadTasks() {
-    // All this should be dynamically loaded using whichever endpoints. For now the user arrays are hardcoded above.
-    // TODO: call GET method to get all tasks for specific user id. e.g. /api/v1/getTasks/{userId}
-    // The resulting records should all be stored in the user arrays exactly as they are hardcoded above.
+async function loadTasks() {
+    userTitles = []
+    userDescriptions = []
+    userDates = []
+    userStatus = []
+    userTaskIds = []
+
+    var uid = 1;
+    const response = await fetch(`https://localhost:7033/ProgressBoard/UserTasks/${uid}`);
+    let tasks = await response.json();
+    console.log(tasks);
+    for (var task of tasks){
+         userTaskIds.push(task.taskId);
+         userStatus.push(task.status);
+         userDates.push("27 May 2024 17:00");
+         userTitles.push(task.taskName);
+         userDescriptions.push(task.taskDescription);
+    }
+    console.log(userTitles);
+    console.log(userDescriptions);
+    console.log(userDates);
+    console.log(userStatus);
+    console.log(userTaskIds);
 }
 
-function buildBoard() {
+async function buildBoard() {
     // Clear board for when cards already exists
     destroyBoard();
     // Load all tasks
-    loadTasks();
+    await loadTasks();
     for (let index = 0; index < userTaskIds.length; index++) {
         const sec = document.createElement('section');
         sec.classList.add('card')

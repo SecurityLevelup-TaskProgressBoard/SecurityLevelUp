@@ -1,19 +1,17 @@
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Server.Models;
+using Server.Models.Dtos;
 using Server.Models.Helpers;
 using Server.Services;
 
 namespace Server.Controllers
 {
     [ApiController]
+	[EnableCors("AllowSpecificOrigin")]
 	[Route("ProgressBoard")]
 	public class ProgressBoardController : ControllerBase
 	{
-		private static readonly string[] Summaries = new[]
-		{
-			"Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-		};
-
 		private readonly ILogger<ProgressBoardController> _logger;
 		private readonly IProgressBoardService _progressBoardService;
 
@@ -24,14 +22,14 @@ namespace Server.Controllers
 		}
 
 		[HttpGet("UserTasks/{UserId}")]
-		public async Task<IEnumerable<TaskModel>> GetUserTasks(int UserId)
+		public async Task<IEnumerable<TaskDto>> GetUserTasks(int UserId)
 		{
 			var result = await _progressBoardService.GetUserTasks(UserId);
 			return result;
 		}
 
 		[HttpPut("UpdateTask")]
-		public async Task<TaskModel> UpdateTask([FromBody] TaskUpdate taskUpdate)
+		public async Task<TaskDto> UpdateTask([FromBody] TaskUpdate taskUpdate)
 		{
 			// Get Task from DB
 			// Set new Status
@@ -42,7 +40,7 @@ namespace Server.Controllers
 		}
 
 		[HttpPost("AddTask")]
-		public async Task<TaskModel> AddTask([FromBody] TaskModel newTask)
+		public async Task<TaskDto> AddTask([FromBody] TaskModel newTask)
 		{
 			var result = await _progressBoardService.AddTask(newTask);
 			return result;

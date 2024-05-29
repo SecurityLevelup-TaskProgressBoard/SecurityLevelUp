@@ -1,10 +1,11 @@
 ﻿using Server.Models;
+using Server.Models.Dtos;
 
 namespace Server.Services
 {
 	public class ProgressBoardService : IProgressBoardService
 	{
-		public async Task<List<TaskModel>> GetUserTasks(int userId)
+		public async Task<List<TaskDto>> GetUserTasks(int userId)
 		{
 			// Delete these. Only here for now
 			var userTitles = new List<string>() { "Card Title", "Spiderman sighted in brooklyn swinging from webs", "A Card Title that is very long and too long actually", "Last One" };
@@ -19,14 +20,14 @@ namespace Server.Services
 			var userTaskIds = new List<int>() { 1, 2, 3, 4 };
 			// Until here
 
-			var answer = new List<TaskModel>();
+			var answer = new List<TaskDto>();
 			for(int i = 0; i < 4; i++)
 			{
-				var tempTask = new TaskModel()
+				var tempTask = new TaskDto()
 				{
 					TaskId = userTaskIds.ElementAt(i),
 					UserId = 1,
-					BoardId = i,
+					Status = userStatus.ElementAt(i),
 					TaskName = userTitles.ElementAt(i),
 					TaskDescription = userDescriptions.ElementAt(i),
 					Date = userDates.ElementAt(i),
@@ -37,15 +38,25 @@ namespace Server.Services
 			return answer;
 		}
 
-		public async Task<TaskModel> UpdateTask(int taskId, string newStatus)
+		public async Task<TaskDto> UpdateTask(int taskId, string newStatus)
 		{
-			var answer = new TaskModel();
+			var answer = new TaskDto();
 			return answer;
 		}
 
-		public async Task<TaskModel> AddTask(TaskModel newTask)
+		public async Task<TaskDto> AddTask(TaskModel newTask)
 		{
-			return newTask;
+			var answer = new TaskDto()
+			{
+				TaskId = 1,
+				UserId = 1,
+				Status = "To do",
+				TaskName = "Add DB Conn",
+				TaskDescription = "ASAP",
+				Date = DateTime.Now,
+				Deleted = false
+			};
+			return answer;
 		}
 
 		public async Task<bool> DeleteTask(int taskId)

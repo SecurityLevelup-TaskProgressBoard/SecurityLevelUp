@@ -1,12 +1,13 @@
 ﻿using Server.Models;
+using Server.Models.Dtos;
 
 namespace Server.Services
 {
 	public interface IProgressBoardService
 	{
-		Task<TaskModel> AddTask(TaskModel newTask);
+		Task<TaskDto> AddTask(TaskModel newTask);
 		Task<bool> DeleteTask(int taskId);
-		Task<List<TaskModel>> GetUserTasks(int userId);
-		Task<TaskModel> UpdateTask(int taskId, string newStatus);
+		Task<List<TaskDto>> GetUserTasks(int userId);
+		Task<TaskDto> UpdateTask(int taskId, string newStatus);
 	}
 }
