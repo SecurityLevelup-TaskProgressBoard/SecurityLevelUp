@@ -4,6 +4,8 @@ let userDescriptions = []
 let userDates = []
 let userStatus = []
 let userTaskIds = []
+var uid = 1;  // TODO: Get the correct user ID and remove hardcode from loadTasks function
+
 
 window.onload = async () => {
     await buildBoard();
@@ -30,6 +32,7 @@ async function loadTasks() {
     userStatus = []
     userTaskIds = []
 
+    // TODO: Get the actual user id
     var uid = 1;
     const response = await fetch(`https://localhost:7033/ProgressBoard/UserTasks/${uid}`);
     let tasks = await response.json();
@@ -122,21 +125,17 @@ async function buildBoard() {
 }
 
 function editTask(cardSection){
-    const taskId = cardSection.getAttribute('taskId') | 0; // <-- Convert to int
-    
     // Show new task fields
     const newTaskSection = document.getElementById('new-task-section'); 
-    // NewTaskClicked(newTaskSection);
+
     if (!HasNewTaskBeenClicked) {
         NewTaskClicked(newTaskSection);
     }
     // Prepop fields
     const taskTitleField = document.getElementById('title-input');
-    console.log(cardSection.getAttribute('title'));
     taskTitleField.value = cardSection.getAttribute('title');
     const taskDescriptionField = document.getElementById('description-input');
     taskDescriptionField.value = cardSection.getAttribute('description');
-
 }
 
 async function moveTask(cardSection){
@@ -149,64 +148,34 @@ async function moveTask(cardSection){
             // TODO: Call endpoint to just update the boardId of the relevant taskId. Something like /api/v1/updateStatus/{taskId}/{newStatus} 
             jsonData = {"taskId" : taskId, 
                         "status": "IN PROGRESS"};
-            try{
-                const response = await fetch(`https://localhost:7033/ProgressBoard/UpdateTask`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(jsonData)
-                });
-                if (!response.ok) {
-                    throw new Error('API error: ' + response.text());
-                };
-            }
-            catch(err){
-                throw new Error('Frontend error: ' + err.message);
-            }
             break;
         case 'IN PROGRESS':
             jsonData = {"taskId" : taskId, 
             "status": "DONE"};
-            try{
-                const response = await fetch(`https://localhost:7033/ProgressBoard/UpdateTask`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(jsonData)
-                });
-                if (!response.ok) {
-                    throw new Error('API error: ' + response.text());
-                };
-            }
-            catch(err){
-                throw new Error('Frontend error: ' + err.message);
-            }
             break;
         case 'DONE':
             jsonData = {"taskId" : taskId, 
             "status": "TODO"};
-            try{
-                const response = await fetch(`https://localhost:7033/ProgressBoard/UpdateTask`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(jsonData)
-                });
-                if (!response.ok) {
-                    throw new Error('API error: ' + response.text());
-                };
-            }
-            catch(err){
-                throw new Error('Frontend error: ' + err.message);
-            }
         break;
         default:
             break;
     }
-
+    // Send PUT request
+    try{
+        const response = await fetch(`https://localhost:7033/ProgressBoard/UpdateTask`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(jsonData)
+        });
+        if (!response.ok) {
+            throw new Error('API error: ' + response.text());
+        };
+    }
+    catch(err){
+        throw new Error('Frontend error: ' + err.message);
+    }
     // Destroy the board
     destroyBoard();
     // Reload the board from the DB with the now updated boardId in the Tasks table (which we did in the switch)
@@ -305,8 +274,35 @@ function NewTaskClicked(section) {
     }
 }
 
-function postTask(){
-    // TODO
+async function postTask(){
+    const title = document.getElementById('title-input').value;
+    const description = document.getElementById('description-input').value;
+    if (title == '' || description == '') {
+        return;
+    }
+    console.log('Title: ' + title + ' Description: ' + description);
+    let jsonData = {"userId": uid,
+                    "boardId": "TODO",
+                    "taskName": title,
+                    "taskDescription": description,
+                    "date": new Date().toISOString(),
+                    "deleted": false};
+    // Send POST request
+    try{
+        const response = await fetch(`https://localhost:7033/ProgressBoard/AddTask`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(jsonData)
+        });
+        if (!response.ok) {
+            throw new Error('API error: ' + response.text());
+        };
+    }
+    catch(err){
+        throw new Error('Frontend error: ' + err.message);
+    }
 
     // TODO: Put lots of validation in here (like lengths, looking for '--', "'" etc.)
 }
