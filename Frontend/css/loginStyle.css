@@ -24,29 +24,31 @@ body {
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
-    height : 70vh;
+    overflow: auto;
+    height: 75vh;
     margin: auto;
-    width: 30rem;
-
+    width: 80%; /* Adjusted to use percentage for dynamic resizing */
+    max-width: 30rem; /* Maximum width to prevent it from getting too wide */
     background-color: rgb(255, 255, 255);
     border-radius: 5%;
-
     justify-content: space-around;
     align-items: center;
-
     box-shadow: 0rem 0rem 0.5rem rgb(72 72 72 / 59%);
 
 }
 
 .login-button{
     border-radius: 0.5rem;
-    width: 15rem;
+    width: 80%; /* Relative width */
+    max-width: 15rem; /* Maximum width */
+    min-width: 5rem; /* Minimum width to avoid being too small */
     height: 2.5rem;
     font-weight: 400;
     font-size: larger;
     border-style: solid;
     background-color: #7CB0B7;
     color: white;
+    transition: width 0.3s ease; /* Smooth resizing */
 }
 
 .login-button:hover{
@@ -55,7 +57,10 @@ body {
 
 .login-heading{
     font-weight: 600;
-    font-size: 2.5rem;
+    font-size: clamp(2rem, 3vw, 3rem);/* Adjust based on viewport width */
+    color: #333; /* Example color */
+    margin: 0.5rem 0; /* Example margin */
+    transition: font-size 0.3s ease; /* Smooth resizing */
 }
 
 .logo-section{
