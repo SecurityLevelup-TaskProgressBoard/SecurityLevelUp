@@ -34,7 +34,7 @@ async function loadTasks() {
 
     // TODO: Get the actual user id
     var uid = 1;
-    const response = await fetch(`https://localhost:7033/ProgressBoard/UserTasks/${uid}`);
+    const response = await fetch(`${backendURL}ProgressBoard/UserTasks/${uid}`);
     let tasks = await response.json();
     console.log(tasks);
     for (var task of tasks){
@@ -91,6 +91,7 @@ async function buildBoard() {
         btnDelete.classList.add('card-button');
         btnDelete.id = 'delete-button-' + String(userTaskIds[index]);
         btnDelete.innerText = 'Delete';
+        btnDelete.onclick = function() {deleteTask(document.getElementById('card-' + String(userTaskIds[index])));};
         sec.appendChild(btnDelete);
 
         const btnEdit = document.createElement('button');
@@ -147,22 +148,22 @@ async function moveTask(cardSection){
             // Update the boardId in the 'Tasks' table from 1 to 2
             // TODO: Call endpoint to just update the boardId of the relevant taskId. Something like /api/v1/updateStatus/{taskId}/{newStatus} 
             jsonData = {"taskId" : taskId, 
-                        "status": "IN PROGRESS"};
+                        "boardId": "IN PROGRESS"};
             break;
         case 'IN PROGRESS':
             jsonData = {"taskId" : taskId, 
-            "status": "DONE"};
+            "boardId": "DONE"};
             break;
         case 'DONE':
             jsonData = {"taskId" : taskId, 
-            "status": "TODO"};
+            "boardId": "TODO"};
         break;
         default:
             break;
     }
     // Send PUT request
     try{
-        const response = await fetch(`https://localhost:7033/ProgressBoard/UpdateTask`, {
+        const response = await fetch(`${backendURL}ProgressBoard/UpdateTask`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -176,6 +177,61 @@ async function moveTask(cardSection){
     catch(err){
         throw new Error('Frontend error: ' + err.message);
     }
+    // Destroy the board
+    destroyBoard();
+    // Reload the board from the DB with the now updated boardId in the Tasks table (which we did in the switch)
+    buildBoard();
+}
+
+async function postTask(){
+    // TODO: Put lots of validation in here (like lengths, looking for '--', "'" etc.)
+
+    const title = document.getElementById('title-input').value;
+    const description = document.getElementById('description-input').value;
+    if (title == '' || description == '') {
+        return;
+    }
+    console.log('Title: ' + title + ' Description: ' + description);
+    let jsonData = {"userId": uid,
+                    "boardId": 1,
+                    "taskName": title,
+                    "taskDescription": description,
+                    "date": new Date().toISOString(),
+                    "deleted": false};
+    // Send POST request
+    try{
+        const response = await fetch(`${backendURL}ProgressBoard/AddTask`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(jsonData)
+        });
+        if (!response.ok) {
+            throw new Error('API error: ' + response.text());
+        };
+    }
+    catch(err){
+        throw new Error('Frontend error: ' + err.message);
+    }
+
+    // Destroy the board
+    destroyBoard();
+    // Reload the board from the DB with the now updated boardId in the Tasks table (which we did in the switch)
+    buildBoard();
+}
+
+// We could probably have used the UpdateTask function for this, but it would have required some extra logic to distiguish between a move/delete
+async function deleteTask(cardSection){
+    alert('Delete functionality blocked, undo this in "deleteTask" function');
+    // ********************
+    return; // DEBUG CODE, to prevent accidental deletions
+    // ********************
+    const taskId = parseInt(cardSection.getAttribute('taskId'));
+
+    // TODO: This should most likely require a body for extra authentication
+    await fetch(`${backendURL}ProgressBoard/DeleteTask/${taskId}`);
+
     // Destroy the board
     destroyBoard();
     // Reload the board from the DB with the now updated boardId in the Tasks table (which we did in the switch)
@@ -272,37 +328,4 @@ function NewTaskClicked(section) {
         sec.remove();
         HasNewTaskBeenClicked = 0;
     }
-}
-
-async function postTask(){
-    const title = document.getElementById('title-input').value;
-    const description = document.getElementById('description-input').value;
-    if (title == '' || description == '') {
-        return;
-    }
-    console.log('Title: ' + title + ' Description: ' + description);
-    let jsonData = {"userId": uid,
-                    "boardId": "TODO",
-                    "taskName": title,
-                    "taskDescription": description,
-                    "date": new Date().toISOString(),
-                    "deleted": false};
-    // Send POST request
-    try{
-        const response = await fetch(`https://localhost:7033/ProgressBoard/AddTask`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(jsonData)
-        });
-        if (!response.ok) {
-            throw new Error('API error: ' + response.text());
-        };
-    }
-    catch(err){
-        throw new Error('Frontend error: ' + err.message);
-    }
-
-    // TODO: Put lots of validation in here (like lengths, looking for '--', "'" etc.)
 }
