@@ -99,18 +99,18 @@ async function buildBoard() {
 
         // Append the card to the relevant board section via its Status (derived from boardId in Tasks table, then Status in Boards table)
         switch (userStatus[index]) {
-            case 'ToDo':
-                sec.setAttribute('boardId', 'ToDo');
+            case 'TODO':
+                sec.setAttribute('boardId', 'TODO');
                 var board = document.getElementById('to-do-board');
                 board.appendChild(sec);
                 break;
-            case 'In Progress':
-                sec.setAttribute('boardId', 'In Progress');
+            case 'IN PROGRESS':
+                sec.setAttribute('boardId', 'IN PROGRESS');
                 var board = document.getElementById('in-progress-board');
                 board.appendChild(sec);
                 break;
-            case 'Done':
-                sec.setAttribute('boardId', 'Done');
+            case 'DONE':
+                sec.setAttribute('boardId', 'DONE');
                 btnMove.innerText = 'Reopen';
                 var board = document.getElementById('done-board');
                 board.appendChild(sec);
@@ -139,38 +139,69 @@ function editTask(cardSection){
 
 }
 
-function moveTask(cardSection){
-    const taskId = cardSection.getAttribute('taskId') | 0; // <-- Convert to int
+async function moveTask(cardSection){
+    const taskId = parseInt(cardSection.getAttribute('taskId'));
     const boardId = cardSection.getAttribute('boardId');
-
+    let jsonData = {};
     switch (boardId) {
-        case 'ToDo':
+        case 'TODO':
             // Update the boardId in the 'Tasks' table from 1 to 2
             // TODO: Call endpoint to just update the boardId of the relevant taskId. Something like /api/v1/updateStatus/{taskId}/{newStatus} 
-            
-            // Debug code ********************************
-            var indexOfTaskId = userTaskIds.indexOf(taskId);
-            userStatus[indexOfTaskId] = 'In Progress';
-            // ********************************
+            jsonData = {"taskId" : taskId, 
+                        "status": "IN PROGRESS"};
+            try{
+                const response = await fetch(`https://localhost:7033/ProgressBoard/UpdateTask`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(jsonData)
+                });
+                if (!response.ok) {
+                    throw new Error('API error: ' + response.text());
+                };
+            }
+            catch(err){
+                throw new Error('Frontend error: ' + err.message);
+            }
             break;
-        case 'In Progress':
-            // Update the boardId in the 'Tasks' table from 2 to 3
-            // TODO
-            
-            // Debug code ********************************
-            var indexOfTaskId = userTaskIds.indexOf(taskId);
-            userStatus[indexOfTaskId] = 'Done';
-            // ********************************
+        case 'IN PROGRESS':
+            jsonData = {"taskId" : taskId, 
+            "status": "DONE"};
+            try{
+                const response = await fetch(`https://localhost:7033/ProgressBoard/UpdateTask`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(jsonData)
+                });
+                if (!response.ok) {
+                    throw new Error('API error: ' + response.text());
+                };
+            }
+            catch(err){
+                throw new Error('Frontend error: ' + err.message);
+            }
             break;
-        case 'Done':
-            // Update the boardId in the 'Tasks' table from 3 to 1
-            // TODO
-            
-            // Debug code ********************************
-            var indexOfTaskId = userTaskIds.indexOf(taskId);
-            userStatus[indexOfTaskId] = 'ToDo';
-
-            // ********************************
+        case 'DONE':
+            jsonData = {"taskId" : taskId, 
+            "status": "TODO"};
+            try{
+                const response = await fetch(`https://localhost:7033/ProgressBoard/UpdateTask`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(jsonData)
+                });
+                if (!response.ok) {
+                    throw new Error('API error: ' + response.text());
+                };
+            }
+            catch(err){
+                throw new Error('Frontend error: ' + err.message);
+            }
         break;
         default:
             break;
@@ -195,7 +226,7 @@ function destroyBoard(){
         newBoardHeading.classList.add('board-heading');
         newBoardHeading.innerText = 'ToDo';
         newBoard.appendChild(newBoardHeading);
-        // Readd board to container
+        // Re-add board to container
         var boardContainer = document.getElementById('board-container');
         boardContainer.appendChild(newBoard);
     }
