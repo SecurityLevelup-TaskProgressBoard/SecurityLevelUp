@@ -1,0 +1,64 @@
+*{
+    font-family: "Poppins", sans-serif;
+}
+
+h1{
+    font-weight: 700;
+}
+
+body {
+    background-image: url("../assets/pattern.png");
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #f0efeb;
+    overflow: hidden;
+    container-type: size;
+    margin: 0%;
+    height: 100dvh;
+
+}
+
+.login-container{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    height : 70vh;
+    margin: auto;
+    width: 30rem;
+
+    background-color: rgb(255, 255, 255);
+    border-radius: 5%;
+
+    justify-content: space-around;
+    align-items: center;
+
+    box-shadow: 0rem 0rem 0.5rem rgb(72 72 72 / 59%);
+
+}
+
+.login-button{
+    border-radius: 0.5rem;
+    width: 15rem;
+    height: 2.5rem;
+    font-weight: 400;
+    font-size: larger;
+    border-style: solid;
+    background-color: #7CB0B7;
+    color: white;
+}
+
+.login-button:hover{
+    background-color: #64939a;
+}
+
+.login-heading{
+    font-weight: 600;
+    font-size: 2.5rem;
+}
+
+.logo-section{
+    text-align: center;
+}
+
