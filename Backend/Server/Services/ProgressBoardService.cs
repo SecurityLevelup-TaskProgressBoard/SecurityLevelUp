@@ -53,11 +53,20 @@ namespace Server.Services
 			return answer;
 		}
 
-		public async Task<TaskDto> AddTask(TaskModel newTask)
+		public async Task<TaskDto> AddTask(TaskDto newTaskDto)
 		{
+			var newTask = TaskDtoToTaskModel(newTaskDto);
+			newTask.UserId = 1;
+			newTask.Deleted = false;
+
+			var boardToAddTo = await _progressDBContext.Boards.Where(t => t.Status == newTaskDto.Status).FirstOrDefaultAsync();
+			if (boardToAddTo == null)
+				throw new Exception($"Board {newTaskDto.Status} does not exist.");
+			newTask.BoardId = boardToAddTo.BoardId;
+
 			_progressDBContext.Tasks.Add(newTask);
-			var answer = TaskModelToTaskDto(newTask);
 			await _progressDBContext.SaveChangesAsync();
+			var answer = TaskModelToTaskDto(newTask);
 			return answer;
 		}
 
@@ -71,9 +80,7 @@ namespace Server.Services
 				return true;
 			}
 			else
-			{
 				throw new Exception($"Task {taskId} does not exist.");
-			}
 		}
 
 		private TaskDto TaskModelToTaskDto(TaskModel inputTask)
@@ -87,6 +94,18 @@ namespace Server.Services
 				TaskDescription = inputTask.TaskDescription,
 				Date = inputTask.Date.ToString(),
 				Deleted = inputTask.Deleted
+			};
+			return answer;
+		}
+
+		private TaskModel TaskDtoToTaskModel(TaskDto inputTask)
+		{
+			var answer = new TaskModel()
+			{
+				UserId = inputTask.UserId,
+				TaskName = inputTask.TaskName,
+				TaskDescription = inputTask.TaskDescription,
+				Date = DateTime.Now
 			};
 			return answer;
 		}

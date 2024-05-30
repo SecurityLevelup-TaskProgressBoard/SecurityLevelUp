@@ -40,7 +40,7 @@ namespace Server.Controllers
 		}
 
 		[HttpPost("AddTask")]
-		public async Task<TaskDto> AddTask([FromBody] TaskModel newTask)
+		public async Task<TaskDto> AddTask([FromBody] TaskDto newTask)
 		{
 			var result = await _progressBoardService.AddTask(newTask);
 			return result;
