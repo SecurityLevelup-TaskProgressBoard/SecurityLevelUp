@@ -1,3 +1,7 @@
+*{
+    font-family: "Poppins", sans-serif;
+}
+
 
 /* Containers */
 .board-container {
@@ -6,36 +10,49 @@
     height : 75vh;
     margin: auto;
     max-width: 50rem;
+    /*added */
+    flex-direction: row;
+    gap: 1rem;
 }
 
 .board {
     border: 0.25em;
-    border-style: solid;
-    background-color: #f1f1f1;
+    /* border-style: solid; */
+    background-color: #EEF2F4;
     width: 90%;
     text-align: center;
     font-size: 0.58em;
     overflow: auto;
-    }
+
+    /* added */
+    border-radius: 10px;
+}
 
 .board-heading{
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    /* font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif; */
+    font-weight: 500;
 }
   
 /* Container cards */
 .card{
     border: 0.25em;
-    border-style: solid;
-    background-color: #2c519b;
+    /* border-style: solid; */
+    background-color: #ffffff;
     margin: 5%;
     border-radius: 0.25rem;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* added */
+    box-shadow: 0px 0px 2px #9a9a9a;
+    font-style: normal;
+    font-weight: 300;
+    padding: 0.5rem;
+    text-align: left;
 }
 
 .card-description {
     text-align: justify;
-    margin-left: 2%;
-    margin-right: 2%;
+    /* margin-left: 2%;
+    margin-right: 2%; */
     overflow: auto;
 }
 
@@ -43,7 +60,7 @@
     font-size: 0.65rem;
     line-height: 1rem;
     background-color: rgb(17 24 39);
-    font-weight: 50;
+    font-weight: 400;
     border-radius: 0.15rem;
     color: #fff;
     margin: 2%;
@@ -65,17 +82,26 @@
     margin-bottom: 1%;
     margin-top: 1%;
 }
- 
+
+.new-task-section{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 1rem 0 1rem;
+}
 
 .new-task-button {
-    color: #090909;
+    color: #ffffff;
     padding: 0.35em 0.7em;
     font-size: 1rem;
     border-radius: 0.35em;
-    background: #e8e8e8;
+    background: #7CB0B7;
     cursor: pointer;
     border: 0.175rem solid #e8e8e8;
-  }
+
+    
+}
 
 .title-input{
     display: flex;

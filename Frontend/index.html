@@ -6,10 +6,17 @@
     <link rel="stylesheet" type="text/css" href="css/styles.css" />
     <script src="js/script.js" defer></script>
     <title>Task Progress Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
 </head>
 <body>
-    <section id="new-task-section" >
+    <section class="new-task-section" id="new-task-section" >
+        <h2>My Tasks</h2>
         <button class="new-task-button" id="new-task-button" onclick="NewTaskClicked(document.getElementById('new-task-section'))">New Task</button>
+    
+    
     </section>
     
     <section id='board-container' class="board-container">
@@ -26,8 +33,11 @@
         </section>
     </section>
 
-    <button onclick="destroyBoard()">destroy board</button>
-    <button onclick="buildBoard()">build board</button>
+    <section>
+        <button class="new-task-button" onclick="buildBoard()">build board</button>
+        <button class="new-task-button" onclick="destroyBoard()">destroy board</button>
+        
+    </section>
 
 </body>
 </html>
