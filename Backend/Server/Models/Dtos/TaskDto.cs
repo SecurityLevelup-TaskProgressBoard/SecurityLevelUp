@@ -12,7 +12,7 @@
 
 		public string TaskDescription { get; set; }
 
-		public DateTime Date { get; set; }
+		public string Date { get; set; }
 
 		public bool Deleted { get; set; }
 	}

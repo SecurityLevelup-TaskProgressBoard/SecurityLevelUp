@@ -85,7 +85,7 @@ namespace Server.Services
 				Status = inputTask.Board.Status,
 				TaskName = inputTask.TaskName,
 				TaskDescription = inputTask.TaskDescription,
-				Date = inputTask.Date,
+				Date = inputTask.Date.ToString(),
 				Deleted = inputTask.Deleted
 			};
 			return answer;

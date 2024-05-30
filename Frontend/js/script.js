@@ -37,7 +37,7 @@ async function loadTasks() {
     for (var task of tasks){
          userTaskIds.push(task.taskId);
          userStatus.push(task.status);
-         userDates.push("27 May 2024 17:00");
+         userDates.push(task.date);
          userTitles.push(task.taskName);
          userDescriptions.push(task.taskDescription);
     }
@@ -53,6 +53,7 @@ async function buildBoard() {
     destroyBoard();
     // Load all tasks
     await loadTasks();
+    
     for (let index = 0; index < userTaskIds.length; index++) {
         const sec = document.createElement('section');
         sec.classList.add('card')
