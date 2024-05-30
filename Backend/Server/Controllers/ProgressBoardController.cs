@@ -7,7 +7,7 @@ using Server.Services;
 
 namespace Server.Controllers
 {
-    [ApiController]
+	[ApiController]
 	[EnableCors("AllowSpecificOrigin")]
 	[Route("ProgressBoard")]
 	public class ProgressBoardController : ControllerBase
@@ -22,35 +22,63 @@ namespace Server.Controllers
 		}
 
 		[HttpGet("UserTasks/{UserId}")]
-		public async Task<IEnumerable<TaskDto>> GetUserTasks(int UserId)
+		public async Task<IActionResult> GetUserTasks(int UserId)
 		{
-			var result = await _progressBoardService.GetUserTasks(UserId);
-			return result;
+			try
+			{
+				var result = await _progressBoardService.GetUserTasks(UserId);
+				return Ok(result);
+			}
+			catch(Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
+
+
 		}
 
 		[HttpPut("UpdateTask")]
-		public async Task<TaskDto> UpdateTask([FromBody] TaskUpdate taskUpdate)
+		public async Task<IActionResult> UpdateTask([FromBody] TaskUpdate taskUpdate)
 		{
-			// Get Task from DB
-			// Set new Status
-			// Save changes
-			// Return task
-			var result = await _progressBoardService.UpdateTask(taskUpdate.TaskId, taskUpdate.NewStatus);
-			return result;
+			try
+			{
+				var result = await _progressBoardService.UpdateTask(taskUpdate.TaskId, taskUpdate.NewStatus);
+				return Ok(result);
+			}
+			catch(Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
 		}
 
 		[HttpPost("AddTask")]
-		public async Task<TaskDto> AddTask([FromBody] TaskDto newTask)
+		public async Task<IActionResult> AddTask([FromBody] TaskDto newTask)
 		{
-			var result = await _progressBoardService.AddTask(newTask);
-			return result;
+			try
+			{
+				var result = await _progressBoardService.AddTask(newTask);
+				return Ok(result);
+			}
+			catch(Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
+
 		}
 
 		[HttpPut("DeleteTask/{TaskId}")]
-		public async Task<bool> DeleteTask(int TaskId)
+		public async Task<IActionResult> DeleteTask(int TaskId)
 		{
-			var result = await _progressBoardService.DeleteTask(TaskId);
-			return result;
+			try
+			{
+				var result = await _progressBoardService.DeleteTask(TaskId);
+				return Ok(result);
+			}
+			catch(Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
+
 		}
 	}
 }

@@ -25,6 +25,9 @@ namespace Server.Services
 							.Include(t => t.User)
 							.Where(t => t.UserId == userId && !t.Deleted)
 							.ToListAsync();
+			if(userTasks.Count == 0)
+				throw new Exception($"Invalid user");
+
 
 			var tasksDto = new List<TaskDto>();
 			foreach(var task in userTasks)
