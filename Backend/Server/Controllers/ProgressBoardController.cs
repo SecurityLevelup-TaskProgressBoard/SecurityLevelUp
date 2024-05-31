@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Server.Models;
@@ -7,7 +8,8 @@ using Server.Services;
 
 namespace Server.Controllers
 {
-	[ApiController]
+    [Authorize]
+    [ApiController]
 	[EnableCors("AllowSpecificOrigin")]
 	[Route("ProgressBoard")]
 	public class ProgressBoardController : ControllerBase
@@ -21,7 +23,8 @@ namespace Server.Controllers
 			_progressBoardService = progressBoardService;
 		}
 
-		[HttpGet("UserTasks/{UserId}")]
+        [Authorize]
+        [HttpGet("UserTasks/{UserId}")]
 		public async Task<IActionResult> GetUserTasks(int UserId)
 		{
 			try
@@ -37,7 +40,8 @@ namespace Server.Controllers
 
 		}
 
-		[HttpPut("UpdateTask")]
+        [Authorize]
+        [HttpPut("UpdateTask")]
 		public async Task<IActionResult> UpdateTask([FromBody] TaskUpdate taskUpdate)
 		{
 			try
@@ -51,7 +55,8 @@ namespace Server.Controllers
 			}
 		}
 
-		[HttpPost("AddTask")]
+        [Authorize]
+        [HttpPost("AddTask")]
 		public async Task<IActionResult> AddTask([FromBody] TaskDto newTask)
 		{
 			try
@@ -66,7 +71,8 @@ namespace Server.Controllers
 
 		}
 
-		[HttpPut("DeleteTask/{TaskId}")]
+        [Authorize]
+        [HttpPut("DeleteTask/{TaskId}")]
 		public async Task<IActionResult> DeleteTask(int TaskId)
 		{
 			try
