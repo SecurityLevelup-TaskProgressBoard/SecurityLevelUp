@@ -9,7 +9,7 @@
     flex-wrap: nowrap;
     height : 75vh;
     margin: auto;
-    max-width: 50rem;
+    max-width: 60rem;
     /*added */
     flex-direction: row;
     gap: 1rem;
@@ -31,6 +31,7 @@
 .board-heading{
     /* font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif; */
     font-weight: 500;
+    font-size: clamp(1rem, 1.2vw, 2rem);
 }
   
 /* Container cards */
@@ -70,7 +71,7 @@
 }
 
 /* New task components */
-.task-create-container{
+/* .task-create-container{
     background-color: #3d5175;
     display: flex;
     flex-direction: column;
@@ -101,7 +102,44 @@
     border: 0.175rem solid #e8e8e8;
 
     
+} */
+
+.task-create-container {
+    position: fixed;
+    z-index: 9999;
+    background-color: #3d5175;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    max-width: 50rem;
+    max-height: 10rem;
+    overflow: auto;
+    padding: 1rem;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
+
+.title-input,
+.description-input,
+.card-button {
+    margin: 0.5rem 0;
+    padding: 0.5rem;
+}
+
+.new-task-section {
+    position: relative;
+}
+
+.new-task-button {
+    color: #ffffff;
+    padding: 0.35em 0.7em;
+    font-size: 1rem;
+    border-radius: 0.35em;
+    background: #7CB0B7;
+    cursor: pointer;
+    border: 0.175rem solid #e8e8e8;
+}
+
 
 .title-input{
     display: flex;
@@ -146,4 +184,53 @@
 .description-input:focus{
     border-color: #4383e3;
     box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.35);
+}
+
+
+.menu-container {
+    position: relative;
+    display: inline-block;
+}
+
+.ellipsis {
+    cursor: pointer;
+    font-size: 1.5rem;
+    padding: 0.5rem;
+}
+
+.menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.menu-item {
+    display: block;
+    padding: 0.5rem 1rem;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+}
+
+.menu-item:hover {
+    background-color: #f0f0f0;
+}
+
+.menu-container:hover .menu {
+    display: block;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    border-bottom: 1px solid #ccc;
 }

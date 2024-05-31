@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+
+        .menu-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .ellipsis {
+            cursor: pointer;
+            font-size: 1.5rem;
+            padding: 0.5rem;
+        }
+
+        .menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .menu-item {
+            display: block;
+            padding: 0.5rem 1rem;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .menu-item:hover {
+            background-color: #f0f0f0;
+        }
+
+        .menu-container:hover .menu {
+            display: block;
+        }
+    </style>
+    <title>Ellipsis Menu</title>
+</head>
+<body>
+    <section class="menu-container">
+        <div class="ellipsis">...</div>
+        <section class="menu">
+            <button class="menu-item">Edit</button>
+            <button class="menu-item">Delete</button>
+        </section>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ellipsis = document.querySelector('.ellipsis');
+            const menu = document.querySelector('.menu');
+
+            ellipsis.addEventListener('click', function(event) {
+                menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+            });
+
+            document.addEventListener('click', function(event) {
+                if (!event.target.closest('.menu-container')) {
+                    menu.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
