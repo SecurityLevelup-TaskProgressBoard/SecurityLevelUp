@@ -1,32 +1,62 @@
 var HasNewTaskBeenClicked = 0;
-// var userTitles = [];  // <-- uncomment for when endpoints are done
-// var userDescriptions = [];
-// var userDates = [];
-// var userStatus = [];
-// var userTaskIds = [];
-// DEBUG *******
-var userTitles = ['Card Title', 'Spiderman sighted in brooklyn swinging from webs', 'A Card Title that is very long and too long actually', 'Last One'];
-var userDescriptions = ['This is a description of the card. It provides some information about the content of the card.', 'The dog needs to be washed and groomed. Remember to buy new shampoo as well, and to use luke warm water. The dog needs to be washed and groomed. Remember to buy new shampoo as well, and to use luke warm water.', 'This is a description of the card. It provides some information about the content of the card.', 'Last descitpion of what happened'];
-var userDates = ['27 May 2024 17:00', '25 May 2024 09:00', '28 May 2024 10:40', '15 May 2024 21:55']
-var userStatus = ['ToDo', 'In Progress', 'Done', 'ToDo'];  // TODO: <-- This needs to be mapped from the int boardId to Status somehow
-var userTaskIds = [1, 2, 3, 4];
-// ***********
-window.onload = () => {
-    buildBoard();
+let userTitles = []
+let userDescriptions = []
+let userDates = []
+let userStatus = []
+let userTaskIds = []
+var uid = 1;  // TODO: Get the correct user ID and remove hardcode from loadTasks function
+
+
+window.onload = async () => {
+    await buildBoard();
+}
+
+const backendURL = "https://localhost:7033/"
+
+async function fetchWithAuth(endpoint, options={}){
+    const headers = new Headers(options.headers || {});
+    let url = backendURL + endpoint;
+    let result=  await fetch(url, {
+        ...options,
+        headers,
+      });
+      if (result.status==401) { alert("Error in calling BE");}
+      else return result;
 }
 
 // This will become async once we call the endpoint in here to get all the user's tasks
-function loadTasks() {
-    // All this should be dynamically loaded using whichever endpoints. For now the user arrays are hardcoded above.
-    // TODO: call GET method to get all tasks for specific user id. e.g. /api/v1/getTasks/{userId}
-    // The resulting records should all be stored in the user arrays exactly as they are hardcoded above.
+async function loadTasks() {
+    userTitles = []
+    userDescriptions = []
+    userDates = []
+    userStatus = []
+    userTaskIds = []
+
+    // TODO: Get the actual user id
+    var uid = 1;
+    const response = await fetch(`${backendURL}ProgressBoard/UserTasks/${uid}`);
+    let tasks = await response.json();
+    console.log(tasks);
+    for (var task of tasks){
+         userTaskIds.push(task.taskId);
+         userStatus.push(task.status);
+         userDates.push(task.date);
+         userTitles.push(task.taskName);
+         userDescriptions.push(task.taskDescription);
+    }
+    console.log(userTitles);
+    console.log(userDescriptions);
+    console.log(userDates);
+    console.log(userStatus);
+    console.log(userTaskIds);
 }
 
-function buildBoard() {
+async function buildBoard() {
     // Clear board for when cards already exists
     destroyBoard();
     // Load all tasks
-    loadTasks();
+    await loadTasks();
+    
     for (let index = 0; index < userTaskIds.length; index++) {
         const sec = document.createElement('section');
         sec.classList.add('card')
@@ -61,6 +91,7 @@ function buildBoard() {
         btnDelete.classList.add('card-button');
         btnDelete.id = 'delete-button-' + String(userTaskIds[index]);
         btnDelete.innerText = 'Delete';
+        btnDelete.onclick = function() {deleteTask(document.getElementById('card-' + String(userTaskIds[index])));};
         sec.appendChild(btnDelete);
 
         const btnEdit = document.createElement('button');
@@ -72,18 +103,18 @@ function buildBoard() {
 
         // Append the card to the relevant board section via its Status (derived from boardId in Tasks table, then Status in Boards table)
         switch (userStatus[index]) {
-            case 'ToDo':
-                sec.setAttribute('boardId', 'ToDo');
+            case 'TODO':
+                sec.setAttribute('boardId', 'TODO');
                 var board = document.getElementById('to-do-board');
                 board.appendChild(sec);
                 break;
-            case 'In Progress':
-                sec.setAttribute('boardId', 'In Progress');
+            case 'IN PROGRESS':
+                sec.setAttribute('boardId', 'IN PROGRESS');
                 var board = document.getElementById('in-progress-board');
                 board.appendChild(sec);
                 break;
-            case 'Done':
-                sec.setAttribute('boardId', 'Done');
+            case 'DONE':
+                sec.setAttribute('boardId', 'DONE');
                 btnMove.innerText = 'Reopen';
                 var board = document.getElementById('done-board');
                 board.appendChild(sec);
@@ -95,59 +126,111 @@ function buildBoard() {
 }
 
 function editTask(cardSection){
-    const taskId = cardSection.getAttribute('taskId') | 0; // <-- Convert to int
-    
     // Show new task fields
     const newTaskSection = document.getElementById('new-task-section'); 
-    // NewTaskClicked(newTaskSection);
+
     if (!HasNewTaskBeenClicked) {
         NewTaskClicked(newTaskSection);
     }
     // Prepop fields
     const taskTitleField = document.getElementById('title-input');
-    console.log(cardSection.getAttribute('title'));
     taskTitleField.value = cardSection.getAttribute('title');
     const taskDescriptionField = document.getElementById('description-input');
     taskDescriptionField.value = cardSection.getAttribute('description');
-
 }
 
-function moveTask(cardSection){
-    const taskId = cardSection.getAttribute('taskId') | 0; // <-- Convert to int
+async function moveTask(cardSection){
+    const taskId = parseInt(cardSection.getAttribute('taskId'));
     const boardId = cardSection.getAttribute('boardId');
-
+    let jsonData = {};
     switch (boardId) {
-        case 'ToDo':
+        case 'TODO':
             // Update the boardId in the 'Tasks' table from 1 to 2
             // TODO: Call endpoint to just update the boardId of the relevant taskId. Something like /api/v1/updateStatus/{taskId}/{newStatus} 
-            
-            // Debug code ********************************
-            var indexOfTaskId = userTaskIds.indexOf(taskId);
-            userStatus[indexOfTaskId] = 'In Progress';
-            // ********************************
+            jsonData = {"taskId" : taskId, 
+                        "boardId": "IN PROGRESS"};
             break;
-        case 'In Progress':
-            // Update the boardId in the 'Tasks' table from 2 to 3
-            // TODO
-            
-            // Debug code ********************************
-            var indexOfTaskId = userTaskIds.indexOf(taskId);
-            userStatus[indexOfTaskId] = 'Done';
-            // ********************************
+        case 'IN PROGRESS':
+            jsonData = {"taskId" : taskId, 
+            "boardId": "DONE"};
             break;
-        case 'Done':
-            // Update the boardId in the 'Tasks' table from 3 to 1
-            // TODO
-            
-            // Debug code ********************************
-            var indexOfTaskId = userTaskIds.indexOf(taskId);
-            userStatus[indexOfTaskId] = 'ToDo';
-
-            // ********************************
+        case 'DONE':
+            jsonData = {"taskId" : taskId, 
+            "boardId": "TODO"};
         break;
         default:
             break;
     }
+    // Send PUT request
+    try{
+        const response = await fetch(`${backendURL}ProgressBoard/UpdateTask`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(jsonData)
+        });
+        if (!response.ok) {
+            throw new Error('API error: ' + response.text());
+        };
+    }
+    catch(err){
+        throw new Error('Frontend error: ' + err.message);
+    }
+    // Destroy the board
+    destroyBoard();
+    // Reload the board from the DB with the now updated boardId in the Tasks table (which we did in the switch)
+    buildBoard();
+}
+
+async function postTask(){
+    // TODO: Put lots of validation in here (like lengths, looking for '--', "'" etc.)
+
+    const title = document.getElementById('title-input').value;
+    const description = document.getElementById('description-input').value;
+    if (title == '' || description == '') {
+        return;
+    }
+    console.log('Title: ' + title + ' Description: ' + description);
+    let jsonData = {"userId": uid,
+                    "boardId": 1,
+                    "taskName": title,
+                    "taskDescription": description,
+                    "date": new Date().toISOString(),
+                    "deleted": false};
+    // Send POST request
+    try{
+        const response = await fetch(`${backendURL}ProgressBoard/AddTask`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(jsonData)
+        });
+        if (!response.ok) {
+            throw new Error('API error: ' + response.text());
+        };
+    }
+    catch(err){
+        throw new Error('Frontend error: ' + err.message);
+    }
+
+    // Destroy the board
+    destroyBoard();
+    // Reload the board from the DB with the now updated boardId in the Tasks table (which we did in the switch)
+    buildBoard();
+}
+
+// We could probably have used the UpdateTask function for this, but it would have required some extra logic to distiguish between a move/delete
+async function deleteTask(cardSection){
+    alert('Delete functionality blocked, undo this in "deleteTask" function');
+    // ********************
+    return; // DEBUG CODE, to prevent accidental deletions
+    // ********************
+    const taskId = parseInt(cardSection.getAttribute('taskId'));
+
+    // TODO: This should most likely require a body for extra authentication
+    await fetch(`${backendURL}ProgressBoard/DeleteTask/${taskId}`);
 
     // Destroy the board
     destroyBoard();
@@ -168,7 +251,7 @@ function destroyBoard(){
         newBoardHeading.classList.add('board-heading');
         newBoardHeading.innerText = 'ToDo';
         newBoard.appendChild(newBoardHeading);
-        // Readd board to container
+        // Re-add board to container
         var boardContainer = document.getElementById('board-container');
         boardContainer.appendChild(newBoard);
     }
@@ -245,10 +328,4 @@ function NewTaskClicked(section) {
         sec.remove();
         HasNewTaskBeenClicked = 0;
     }
-}
-
-function postTask(){
-    // TODO
-
-    // TODO: Put lots of validation in here (like lengths, looking for '--', "'" etc.)
 }
