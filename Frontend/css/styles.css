@@ -1,3 +1,6 @@
+*{
+    font-family: "Poppins", sans-serif;
+}
 
 /* Containers */
 .board-container {
@@ -5,37 +8,54 @@
     flex-wrap: nowrap;
     height : 75vh;
     margin: auto;
-    max-width: 50rem;
+    max-width: 60rem;
+
+    /*added */
+    flex-direction: row;
+    gap: 1rem;
 }
 
 .board {
     border: 0.25em;
-    border-style: solid;
-    background-color: #f1f1f1;
+    /* border-style: solid; */
+    background-color: #EEF2F4;
     width: 90%;
     text-align: center;
     font-size: 0.58em;
     overflow: auto;
-    }
+
+     /* added */
+     border-radius: 10px;
+}
 
 .board-heading{
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    /* font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif; */
+
+    font-weight: 500;
+    font-size: clamp(1rem, 1.2vw, 2rem);
 }
   
 /* Container cards */
 .card{
     border: 0.25em;
-    border-style: solid;
-    background-color: #2c519b;
+    /* border-style: solid; */
+    background-color: #ffffff;
     margin: 5%;
     border-radius: 0.25rem;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+    /* added */
+    box-shadow: 0px 0px 2px #9a9a9a;
+    font-style: normal;
+    font-weight: 300;
+    padding: 0.5rem;
+    text-align: left;
 }
 
 .card-description {
     text-align: justify;
-    margin-left: 2%;
-    margin-right: 2%;
+    /* margin-left: 2%;
+    margin-right: 2%; */
     overflow: auto;
 }
 
@@ -43,7 +63,7 @@
     font-size: 0.65rem;
     line-height: 1rem;
     background-color: rgb(17 24 39);
-    font-weight: 50;
+    font-weight: 400;
     border-radius: 0.15rem;
     color: #fff;
     margin: 2%;
@@ -54,28 +74,42 @@
 
 /* New task components */
 .task-create-container{
+    position: fixed;
+    z-index: 9999;
     background-color: #3d5175;
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
-    margin: auto;
     max-width: 50rem;
     max-height: 10rem;
     overflow: auto;
-    margin-bottom: 1%;
-    margin-top: 1%;
+    padding: 1rem;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
  
+.title-input,
+.description-input,
+.card-button {
+    margin: 0.5rem 0;
+    padding: 0.5rem;
+}
+
+.new-task-section {
+    position: relative;
+}
 
 .new-task-button {
-    color: #090909;
+    color: #ffffff;
     padding: 0.35em 0.7em;
     font-size: 1rem;
     border-radius: 0.35em;
-    background: #e8e8e8;
+    background: #7CB0B7;
     cursor: pointer;
     border: 0.175rem solid #e8e8e8;
   }
+
+
 
 .title-input{
     display: flex;
@@ -97,6 +131,8 @@
     border-color: #4383e3;
     box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.35);
 }
+
+
 
 .description-input{
     display: flex;
@@ -120,4 +156,55 @@
 .description-input:focus{
     border-color: #4383e3;
     box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.35);
+}
+
+
+
+
+.menu-container {
+    position: relative;
+    display: inline-block;
+}
+
+.ellipsis {
+    cursor: pointer;
+    font-size: 1.5rem;
+    padding: 0.5rem;
+}
+
+.menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.menu-item {
+    display: block;
+    padding: 0.5rem 1rem;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+}
+
+.menu-item:hover {
+    background-color: #f0f0f0;
+}
+
+.menu-container:hover .menu {
+    display: block;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    border-bottom: 1px solid #ccc;
 }

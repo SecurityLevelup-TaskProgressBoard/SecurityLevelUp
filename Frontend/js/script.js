@@ -59,15 +59,49 @@ async function buildBoard() {
     
     for (let index = 0; index < userTaskIds.length; index++) {
         const sec = document.createElement('section');
-        sec.classList.add('card')
+        sec.classList.add('card');
         sec.id = 'card-' + String(userTaskIds[index]);  // Will use later when moving and deleting 
         sec.setAttribute('taskId', userTaskIds[index]);
-
+    
+        // Create a section for the heading and ellipsis menu
+        const headerSection = document.createElement('section');
+        headerSection.classList.add('card-header');
+    
         const title = document.createElement('h2');
-        title.classList.add('card-title')
+        title.classList.add('card-title');
         title.innerText = userTitles[index];
-        sec.setAttribute('title', userTitles[index]);
-        sec.appendChild(title);
+        headerSection.appendChild(title);
+    
+        const menuContainer = document.createElement('div');
+        menuContainer.classList.add('menu-container');
+    
+        const ellipsis = document.createElement('div');
+        ellipsis.classList.add('ellipsis');
+        ellipsis.innerText = '...';
+    
+        const menu = document.createElement('div');
+        menu.classList.add('menu');
+    
+        const btnEdit = document.createElement('button');
+        btnEdit.classList.add('menu-item');
+        btnEdit.id = 'edit-button-' + String(userTaskIds[index]);
+        btnEdit.innerText = 'Edit';
+        btnEdit.onclick = function() {editTask(document.getElementById('card-' + String(userTaskIds[index])));};
+    
+        const btnDelete = document.createElement('button');
+        btnDelete.classList.add('menu-item');
+        btnDelete.id = 'delete-button-' + String(userTaskIds[index]);
+        btnDelete.innerText = 'Delete';
+    
+        menu.appendChild(btnEdit);
+        menu.appendChild(btnDelete);
+        menuContainer.appendChild(ellipsis);
+        menuContainer.appendChild(menu);
+        headerSection.appendChild(menuContainer);
+    
+        sec.appendChild(headerSection);
+
+
 
         const description = document.createElement('p');
         description.classList.add('card-description');
@@ -86,20 +120,6 @@ async function buildBoard() {
         btnMove.innerText = 'Advance';
         btnMove.onclick = function() {moveTask(document.getElementById('card-' + String(userTaskIds[index])));};
         sec.appendChild(btnMove);
-
-        const btnDelete = document.createElement('button');
-        btnDelete.classList.add('card-button');
-        btnDelete.id = 'delete-button-' + String(userTaskIds[index]);
-        btnDelete.innerText = 'Delete';
-        btnDelete.onclick = function() {deleteTask(document.getElementById('card-' + String(userTaskIds[index])));};
-        sec.appendChild(btnDelete);
-
-        const btnEdit = document.createElement('button');
-        btnEdit.classList.add('card-button');
-        btnEdit.id = 'edit-button-' + String(userTaskIds[index]);
-        btnEdit.innerText = 'Edit';
-        btnEdit.onclick = function() {editTask(document.getElementById('card-' + String(userTaskIds[index])));};
-        sec.appendChild(btnEdit);
 
         // Append the card to the relevant board section via its Status (derived from boardId in Tasks table, then Status in Boards table)
         switch (userStatus[index]) {
