@@ -13,6 +13,8 @@
     /*added */
     flex-direction: row;
     gap: 1rem;
+
+    transition: flex-direction 0.5s ease, align-items 0.5s ease;
 }
 
 .board {
@@ -58,9 +60,10 @@
 }
 
 .card-button{
-    font-size: 0.65rem;
+    font-size: 0.70rem;
+    font-weight: 600;
     line-height: 1rem;
-    background-color: rgb(17 24 39);
+    background-color: #7CB0B7;
     font-weight: 400;
     border-radius: 0.15rem;
     color: #fff;
@@ -68,6 +71,10 @@
     padding: 0.25rem;
     border: none;
     max-height: 2rem;
+}
+
+.card-button:hover, .new-task-button:hover{
+    background-color: #6a969c;
 }
 
 /* New task components */
@@ -128,6 +135,13 @@
 
 .new-task-section {
     position: relative;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 1rem;
 }
 
 .new-task-button {
@@ -234,3 +248,22 @@
 
     border-bottom: 1px solid #ccc;
 }
+
+.date-section{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+@container (max-width: 600px) {
+    .board-container {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .board{
+        overflow: visible;
+    }
+  }
+  

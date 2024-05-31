@@ -30,6 +30,7 @@ function buildBoard() {
     for (let index = 0; index < userTaskIds.length; index++) {
         const sec = document.createElement('section');
         sec.classList.add('card');
+        sec.setAttribute('draggable', 'true');
         sec.id = 'card-' + String(userTaskIds[index]);  // Will use later when moving and deleting 
         sec.setAttribute('taskId', userTaskIds[index]);
     
@@ -77,17 +78,34 @@ function buildBoard() {
         sec.setAttribute('description', userDescriptions[index]);
         sec.appendChild(description);
     
+        // const date = document.createElement('p');
+        // date.classList.add('card-date');
+        // date.innerText = userDates[index];
+        // sec.appendChild(date);
+    
+        // const btnMove = document.createElement('button');
+        // btnMove.classList.add('card-button');
+        // btnMove.id = 'move-button-' + String(userTaskIds[index]); // This is a bit redundant but might be useful later
+        // btnMove.innerText = 'Advance';
+        // btnMove.onclick = function() {moveTask(document.getElementById('card-' + String(userTaskIds[index])));};
+        // sec.appendChild(btnMove);
+
+        const dateSection = document.createElement('section');
+        dateSection.classList.add('date-section');
+
         const date = document.createElement('p');
         date.classList.add('card-date');
         date.innerText = userDates[index];
-        sec.appendChild(date);
-    
+        dateSection.appendChild(date);
+
         const btnMove = document.createElement('button');
         btnMove.classList.add('card-button');
         btnMove.id = 'move-button-' + String(userTaskIds[index]); // This is a bit redundant but might be useful later
         btnMove.innerText = 'Advance';
         btnMove.onclick = function() {moveTask(document.getElementById('card-' + String(userTaskIds[index])));};
-        sec.appendChild(btnMove);
+        dateSection.appendChild(btnMove);
+
+        sec.appendChild(dateSection);
     
         // Append the card to the relevant board section via its Status (derived from boardId in Tasks table, then Status in Boards table)
         switch (userStatus[index]) {
@@ -132,6 +150,36 @@ function editTask(cardSection){
     taskDescriptionField.value = cardSection.getAttribute('description');
 
 }
+
+let draggedElement = null;
+
+document.addEventListener('dragstart', function(event) {
+  draggedElement = event.target;
+  event.dataTransfer.setData('text/plain', draggedElement.id);
+  
+});
+
+document.addEventListener('dragover', function(event) {
+  event.preventDefault();
+});
+
+document.addEventListener('drop', function(event) {
+    event.preventDefault();
+    if (event.target.classList.contains('board')) {
+      const taskId = draggedElement.getAttribute('taskId');
+      const newBoardId = event.target.getAttribute('boardId');
+      // Update the boardId of the task (for demo purposes, update the UI only)
+      const indexOfTaskId = userTaskIds.indexOf(parseInt(taskId));
+      userStatus[indexOfTaskId] = newBoardId;
+  
+      // Append the card to the target board
+      event.target.appendChild(draggedElement);
+    }
+    draggedElement = null;
+});
+
+
+
 
 function moveTask(cardSection){
     const taskId = cardSection.getAttribute('taskId') | 0; // <-- Convert to int
