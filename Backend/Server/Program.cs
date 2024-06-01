@@ -23,8 +23,7 @@ namespace Server
 
 			builder.Services.AddScoped<IProgressBoardService, ProgressBoardService>();
 
-			var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")
-								   ?? builder.Configuration.GetConnectionString("Default");
+			var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
 
 			builder.Services.AddDbContext<TaskProgressDBContext>(options =>
 				options.UseSqlServer(connectionString));
