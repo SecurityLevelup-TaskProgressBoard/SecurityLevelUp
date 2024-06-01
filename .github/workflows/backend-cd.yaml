@@ -54,6 +54,10 @@ jobs:
           chmod 600 pvt_key.pem
           mkdir -p ~/.ssh
           ssh-keyscan ${{env.EC2_IP}} >> ~/.ssh/known_hosts
+          if [ ! -f "pvt_key.pem" ]; then
+            echo "Private key file does not exist."
+            exit 1
+          fi
 
       - name: Upload to EC2
         working-directory: ./Backend/Server
