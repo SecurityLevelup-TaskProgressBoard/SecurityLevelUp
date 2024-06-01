@@ -1,11 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Server.Context
 {
 	public partial class TaskProgressDBContext : DbContext
 	{
-		private void RegisterDb(DbContextOptionsBuilder optionsBuilder, int retryCount=3)
+		private static readonly ILoggerFactory _loggerFactory = LoggerFactory.Create(builder =>
+		{
+			builder
+				.AddConsole()
+				.AddFilter((category, level) =>
+					category == DbLoggerCategory.Database.Command.Name && level == LogLevel.Warning);
+		});
+
+		private void RegisterDb(DbContextOptionsBuilder optionsBuilder, int retryCount = 3)
 		{
 			try
 			{
@@ -13,19 +20,21 @@ namespace Server.Context
 													.AddJsonFile("appsettings.json")
 													.Build();
 				string connectionString = configuration.GetConnectionString("TPBDBConnection");
-
-				optionsBuilder.UseSqlServer(connectionString);
-			} catch(Exception)
+				optionsBuilder.UseLoggerFactory(_loggerFactory)
+								.UseSqlServer(connectionString);
+			}
+			catch(Exception)
 			{
-				if (retryCount > 0)
+				if(retryCount > 0)
 				{
-					RegisterDb(optionsBuilder, retryCount-1);
-				} else
+					RegisterDb(optionsBuilder, retryCount - 1);
+				}
+				else
 				{
 					throw new Exception("Error reading connectionstring");
 				}
 			}
-			
+
 		}
 	}
 }

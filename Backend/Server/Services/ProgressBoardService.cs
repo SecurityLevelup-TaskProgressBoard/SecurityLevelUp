@@ -2,10 +2,6 @@
 using Server.Context;
 using Server.Models;
 using Server.Models.Dtos;
-using System.Net.NetworkInformation;
-using System.Threading.Tasks;
-using System.Threading.Tasks.Sources;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Server.Services
 {
@@ -38,19 +34,35 @@ namespace Server.Services
 			return tasksDto;
 		}
 
-		public async Task<TaskDto> UpdateTask(int taskId, string newStatus)
+		public async Task<TaskDto> UpdateTask(int taskId, string? newStatus, string? newDescription, string? newName)
 		{
-			var taskToUpdate = _progressDBContext.Tasks.Include(t=>t.Board).FirstOrDefault(t => t.TaskId == taskId);
+			var taskToUpdate = _progressDBContext.Tasks
+								.Include(t => t.Board)
+								.FirstOrDefault(t => t.TaskId == taskId);
 			if(taskToUpdate == null)
 				throw new Exception($"Task {taskId} does not exist.");
 
-			// Get boardID for new status
-			var newBoard = _progressDBContext.Boards.FirstOrDefault(t => t.Status == newStatus);
+			// Update the board if we want to change the task's status
+			if(!string.IsNullOrEmpty(newStatus))
+			{
+				var newBoard = _progressDBContext.Boards
+								.FirstOrDefault(t => t.Status == newStatus);
 
-			if(newBoard == null)
-				throw new Exception($"Status {newStatus} does not exist");
+				if(newBoard == null)
+					throw new Exception($"Status {newStatus} does not exist");
+				taskToUpdate.BoardId = newBoard.BoardId;
+			}			
+			// Update the task's description if we want to change that
+			if(!string.IsNullOrEmpty(newDescription))
+			{
+				taskToUpdate.TaskDescription = newDescription;
+			}
+			// Update the task's name if we want to update that:
+			if(!string.IsNullOrEmpty(newName))
+			{
+				taskToUpdate.TaskName = newName;
+			}
 
-			taskToUpdate.BoardId = newBoard.BoardId;
 			await _progressDBContext.SaveChangesAsync();
 			var answer = TaskModelToTaskDto(taskToUpdate);
 			return answer;
@@ -62,8 +74,11 @@ namespace Server.Services
 			newTask.UserId = 1;
 			newTask.Deleted = false;
 
-			var boardToAddTo = await _progressDBContext.Boards.Where(t => t.Status == newTaskDto.Status).FirstOrDefaultAsync();
-			if (boardToAddTo == null)
+			var boardToAddTo = await _progressDBContext.Boards
+								.Where(t => t.Status == newTaskDto.Status)
+								.FirstOrDefaultAsync();
+
+			if(boardToAddTo == null)
 				throw new Exception($"Board {newTaskDto.Status} does not exist.");
 			newTask.BoardId = boardToAddTo.BoardId;
 
@@ -75,7 +90,8 @@ namespace Server.Services
 
 		public async Task<bool> DeleteTask(int taskId)
 		{
-			var taskToDelete = _progressDBContext.Tasks.FirstOrDefault(t => t.TaskId == taskId);
+			var taskToDelete = _progressDBContext.Tasks
+								.FirstOrDefault(t => t.TaskId == taskId);
 			if(taskToDelete != null)
 			{
 				taskToDelete.Deleted = true;

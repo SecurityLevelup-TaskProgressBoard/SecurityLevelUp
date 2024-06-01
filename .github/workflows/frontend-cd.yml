@@ -1,0 +1,36 @@
+name: Frontend CD
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+    paths:
+      - "Frontend/**"
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  web-cd:
+    name: Website CD
+    runs-on: ubuntu-latest
+
+    env:
+      web_directory: ./Frontend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Assume the deploy pipeline user role
+        uses: aws-actions/configure-aws-credentials@v4.0.1
+        with:
+          role-to-assume: ${{secrets.AWS_SECRET_ASSUME_ROLE}}
+          role-session-name: federatedOIDC-GH-AWS
+          aws-region: ${{secrets.AWS_SECRET_REGION}}
+
+      - name: Deploy Fronted Files
+        working-directory: ${{ env.web_directory }}
+        run: aws s3 cp . s3://tpb-web-bucket/ --recursive
