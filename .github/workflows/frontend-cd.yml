@@ -1,7 +1,12 @@
-name: Web CD
+name: Frontend CD
 
 on:
-  workflow_call:
+  push:
+    branches:
+      - main
+      - dev
+    paths:
+      - "Frontend/**"
 
 permissions:
   contents: read

@@ -1,0 +1,32 @@
+name: Backend CD
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+    paths:
+      - "Backend/**"
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  backend-cd:
+    name: Backend CD
+    runs-on: ubuntu-latest
+
+    env:
+      backend_directory: ./Backend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Assume the deploy pipeline user role
+        uses: aws-actions/configure-aws-credentials@v4.0.1
+        with:
+          role-to-assume: ${{secrets.AWS_SECRET_ASSUME_ROLE}}
+          role-session-name: federatedOIDC-GH-AWS
+          aws-region: ${{secrets.AWS_SECRET_REGION}}
