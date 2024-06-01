@@ -14,15 +14,11 @@ permissions:
 
 jobs:
   backend-cd:
-    name: Backend CD
     runs-on: ubuntu-latest
 
-    env:
-      backend_directory: ./Backend
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
       - name: Assume the deploy pipeline user role
         uses: aws-actions/configure-aws-credentials@v4.0.1
@@ -30,3 +26,44 @@ jobs:
           role-to-assume: ${{secrets.AWS_SECRET_ASSUME_ROLE}}
           role-session-name: federatedOIDC-GH-AWS
           aws-region: ${{secrets.AWS_SECRET_REGION}}
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.x
+
+      - name: Install ASP.NET Core
+        run: dotnet tool install --global dotnet-aspnet-codegenerator
+
+      - name: Build and publish project
+        working-directory: ./Backend/Server
+        run: |
+          dotnet restore ./Server.csproj
+          dotnet build -c Release ./Server.csproj
+          dotnet publish -c Release ./Server.csproj
+
+      - name: Get IP Address
+        run: |
+          EC2_IP=$(aws ec2 describe-instances \
+          --filters "Name=tag:Name,Values=tpb-ec2-instance" \
+          --query "Reservations[*].Instances[*].PublicDnsName" \
+          --output text --region ${{secrets.AWS_SECRET_REGION}})
+          echo "EC2_IP=$EC2_IP" >> $GITHUB_ENV
+
+      - name: Fetch private key and add it to known hosts
+        run: |
+          aws ssm get-parameter --name "tpb-ec2-key" --with-decryption --query 'Parameter.Value' --region ${{secrets.AWS_SECRET_REGION}} --output text > pvt_key.pem
+          chmod 600 pvt_key.pem
+          mkdir -p ~/.ssh
+          ssh-keyscan ${{env.EC2_IP}} >> ~/.ssh/known_hosts
+
+      - name: Upload to EC2
+        working-directory: ./Backend/Server
+        run: |
+          ssh -i pvt_key.pem ec2-user@${{ env.EC2_IP }} "sudo systemctl stop server.service && \
+          rm -rf /home/ec2-user/server/*"
+          tar -czvf api_archive.tar.gz -C ./bin/Release/net8.0/publish/ .
+          scp -v -i pvt_key.pem api_archive.tar.gz ec2-user@${{ env.EC2_IP }}:/home/ec2-user/server/
+          ssh -i pvt_key.pem ec2-user@${{ env.EC2_IP }} "tar -xzvf /home/ec2-user/server/api_archive.tar.gz -C /home/ec2-user/server && \
+          rm /home/ec2-user/server/api_archive.tar.gz && \
+          sudo systemctl start server.service"
