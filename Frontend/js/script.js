@@ -43,14 +43,14 @@ function buildBoard() {
         title.innerText = userTitles[index];
         headerSection.appendChild(title);
     
-        const menuContainer = document.createElement('div');
+        const menuContainer = document.createElement('section'); //div
         menuContainer.classList.add('menu-container');
     
-        const ellipsis = document.createElement('div');
+        const ellipsis = document.createElement('section'); //div
         ellipsis.classList.add('ellipsis');
         ellipsis.innerText = '...';
     
-        const menu = document.createElement('div');
+        const menu = document.createElement('section'); //div
         menu.classList.add('menu');
     
         const btnEdit = document.createElement('button');
