@@ -2,10 +2,6 @@
 using Server.Context;
 using Server.Models;
 using Server.Models.Dtos;
-using System.Net.NetworkInformation;
-using System.Threading.Tasks;
-using System.Threading.Tasks.Sources;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Server.Services
 {
