@@ -8,6 +8,6 @@ namespace Server.Services
 		Task<TaskDto> AddTask(TaskDto newTask);
 		Task<bool> DeleteTask(int taskId);
 		Task<List<TaskDto>> GetUserTasks(int userId);
-		Task<TaskDto> UpdateTask(int taskId, string newStatus);
+		Task<TaskDto> UpdateTask(int taskId, string? newStatus, string? newDescription, string? newName);
 	}
 }
