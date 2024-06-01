@@ -29,12 +29,24 @@ namespace Server.Controllers
 				var result = await _progressBoardService.GetUserTasks(UserId);
 				return Ok(result);
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
 				return BadRequest(ex.Message);
 			}
 
 
+		}
+
+		[HttpGet("ping")]
+		public async Task<IActionResult> Ping(int UserId)
+		{
+			var response = new
+			{
+				reply = "pong",
+				easterEgg = "Chuqin Wang"
+			};
+
+			return Ok(response);
 		}
 
 		[HttpPut("UpdateTask")]
@@ -45,7 +57,7 @@ namespace Server.Controllers
 				var result = await _progressBoardService.UpdateTask(taskUpdate.TaskId, taskUpdate.NewStatus, taskUpdate.NewDescription, taskUpdate.NewName);
 				return Ok(result);
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
 				return BadRequest(ex.Message);
 			}
@@ -59,7 +71,7 @@ namespace Server.Controllers
 				var result = await _progressBoardService.AddTask(newTask);
 				return Ok(result);
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
 				return BadRequest(ex.Message);
 			}
@@ -73,7 +85,7 @@ namespace Server.Controllers
 				var result = await _progressBoardService.DeleteTask(TaskId);
 				return Ok(result);
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
 				return BadRequest(ex.Message);
 			}

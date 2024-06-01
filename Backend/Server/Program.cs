@@ -13,8 +13,8 @@ namespace Server
 			builder.Services.AddCors(options =>
 			{
 				options.AddPolicy("AllowSpecificOrigin",
-					builder => builder
-						.WithOrigins("http://127.0.0.1:5500") // Replace with your frontend URL
+					policyBuilder => policyBuilder
+						.WithOrigins("http://localhost:5500") //https://taskify.phipson.co.za
 						.AllowAnyHeader()
 						.AllowAnyMethod());
 			});
@@ -22,23 +22,30 @@ namespace Server
 			builder.Services.AddControllers();
 
 			builder.Services.AddScoped<IProgressBoardService, ProgressBoardService>();
-			builder.Services.AddDbContext<TaskProgressDBContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+
+			var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+
+			builder.Services.AddDbContext<TaskProgressDBContext>(options =>
+				options.UseSqlServer(connectionString));
 
 			builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwaggerGen();
 
+			builder.WebHost.ConfigureKestrel(serverOptions =>
+			{
+				serverOptions.ListenAnyIP(5000);
+			});
+
 			var app = builder.Build();
 
-			if(app.Environment.IsDevelopment())
+			if (app.Environment.IsDevelopment())
 			{
 				app.UseSwagger();
 				app.UseSwaggerUI();
 			}
 
 			app.UseHttpsRedirection();
-
 			app.UseAuthorization();
-			app.UseCors();
 			app.UseCors("AllowSpecificOrigin");
 
 			app.MapControllers();
