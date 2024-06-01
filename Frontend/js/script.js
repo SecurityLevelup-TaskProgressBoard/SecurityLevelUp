@@ -10,7 +10,7 @@ window.onload = async () => {
   await buildBoard();
 };
 
-const backendURL = "https://localhost:7033/";
+const backendURL = "http://localhost:5000/";
 
 async function fetchWithAuth(endpoint, options = {}) {
   const headers = new Headers(options.headers || {});
