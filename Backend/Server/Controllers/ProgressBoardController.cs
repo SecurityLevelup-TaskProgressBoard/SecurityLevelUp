@@ -42,7 +42,7 @@ namespace Server.Controllers
 		{
 			try
 			{
-				var result = await _progressBoardService.UpdateTask(taskUpdate.TaskId, taskUpdate.NewStatus);
+				var result = await _progressBoardService.UpdateTask(taskUpdate.TaskId, taskUpdate.NewStatus, taskUpdate.NewDescription, taskUpdate.NewName);
 				return Ok(result);
 			}
 			catch(Exception ex)
@@ -63,7 +63,6 @@ namespace Server.Controllers
 			{
 				return BadRequest(ex.Message);
 			}
-
 		}
 
 		[HttpPut("DeleteTask/{TaskId}")]
@@ -78,7 +77,6 @@ namespace Server.Controllers
 			{
 				return BadRequest(ex.Message);
 			}
-
 		}
 	}
 }
