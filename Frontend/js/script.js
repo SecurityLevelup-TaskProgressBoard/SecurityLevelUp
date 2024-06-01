@@ -6,22 +6,78 @@ let userStatus = [];
 let userTaskIds = [];
 var uid = 1; // TODO: Get the correct user ID and remove hardcode from loadTasks function
 
+function getTokens() {
+    // Check if tokens are in the URL fragment
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const idToken = hashParams.get('id_token');
+    const accessToken = hashParams.get('access_token');
+
+    if(idToken && accessToken) {
+        console.log("THERE BE TOKENS");
+        // Save tokens to session storage
+        sessionStorage.setItem('idToken', idToken);
+        sessionStorage.setItem('accessToken', accessToken);
+
+        console.log(sessionStorage.getItem('idToken'));
+        console.log(sessionStorage.getItem('accessToken'));
+        // Remove tokens from URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+
+        // Redirect to a different page
+        // window.location.href = 'https://localhost:5500/Frontend/index.html';
+    } else {
+        // Tokens not found in URL, check session storage
+        const storedIdToken = sessionStorage.getItem('idToken');
+        const storedAccessToken = sessionStorage.getItem('accessToken');
+
+        if(storedIdToken && storedAccessToken) {
+            console.log("TOKENS IN SESSION STORAGE!");
+            console.log(storedIdToken);
+            console.log(storedAccessToken);
+        } else {
+            // Tokens not found in session storage, redirect to login page
+            console.log("NO TOKENS IN SESSION STORAGE!");
+            window.location.href = 'https://localhost:5500/Frontend/login.html';
+        }
+    }
+}
+
 window.onload = async () => {
-  await buildBoard();
+    //getTokens();
+    await buildBoard();
 };
 
 const backendURL = "https://localhost:7033/";
 
 async function fetchWithAuth(endpoint, options = {}) {
-  const headers = new Headers(options.headers || {});
-  let url = backendURL + endpoint;
-  let result = await fetch(url, {
-    ...options,
-    headers,
-  });
-  if (result.status == 401) {
-    alert("Error in calling BE");
-  } else return result;
+    const headers = new Headers(options.headers || {});
+    //added the token part 
+    const token = sessionStorage.getItem('idToken');
+    if (token) {
+        headers.set('Authorization', `Bearer ${token}`);
+    }
+
+    let url = backendURL + endpoint;
+    let result = await fetch(url, {
+        ...options,
+        headers,
+    });
+    if (result.status == 401) {
+        alert("Error in calling BE");
+    } else return result;
+}
+
+async function getEmail(){
+    console.log('getting email!@@@@@');
+    
+    let response = await fetchWithAuth('ProgressBoard/email');
+
+    let data = await response;
+
+
+    //const response = await fetch(`${backendURL}ProgressBoard/email`);
+    //let tasks = await response.json();
+    console.log(data);
 }
 
 // This will become async once we call the endpoint in here to get all the user's tasks

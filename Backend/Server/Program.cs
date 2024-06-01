@@ -7,7 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace Server
 {
-	public class Program
+    public class Program
 	{
 		public static void Main(string[] args)
 		{
@@ -29,9 +29,10 @@ namespace Server
 
 			builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwaggerGen();
+            builder.Services.AddScoped<ITokenService, TokenService>();
 
 
-			builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 				.AddJwtBearer(options =>
 				{
 					options.Authority = builder.Configuration["Cognito:Authority"];

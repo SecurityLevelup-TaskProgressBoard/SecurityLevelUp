@@ -1,10 +1,11 @@
 
-const cognito = "https://taskify-secuirtylevelup.auth.eu-west-1.amazoncognito.com/oauth2/authorize?client_id=7clapqn1ahmris82jnsv8ku0c2&response_type=token&scope=email+openid&redirect_uri=http://localhost:5500/Frontend/login.html";
+//const cognito = "https://taskify-secuirtylevelup.auth.eu-west-1.amazoncognito.com/oauth2/authorize?client_id=7clapqn1ahmris82jnsv8ku0c2&response_type=token&scope=email+openid&redirect_uri=http://localhost:5500/Frontend/login.html";
 
+
+const loginURL = "https://taskify-secuirty.auth.eu-west-1.amazoncognito.com/oauth2/authorize?client_id=66lc4rli2hjagrads5atsjbumg&response_type=token&scope=email+openid+profile&redirect_uri=http://localhost:5500/Frontend/index.html"
 function login(){
-    window.location.href = cognito;
+    window.location.href = loginURL;
 }
-
 
 function getTokens() {
     // Check if tokens are in the URL fragment
