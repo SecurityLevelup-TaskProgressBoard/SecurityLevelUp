@@ -4,46 +4,53 @@ using Server.Services;
 
 namespace Server
 {
-	public class Program
-	{
-		public static void Main(string[] args)
-		{
-			var builder = WebApplication.CreateBuilder(args);
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            var builder = WebApplication.CreateBuilder(args);
 
-			builder.Services.AddCors(options =>
-			{
-				options.AddPolicy("AllowSpecificOrigin",
-					builder => builder
-						.WithOrigins("http://127.0.0.1:5500") // Replace with your frontend URL
-						.AllowAnyHeader()
-						.AllowAnyMethod());
-			});
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowSpecificOrigin",
+                    policyBuilder => policyBuilder
+                        .WithOrigins("http://localhost:5500") //https://taskify.phipson.co.za
+                        .AllowAnyHeader()
+                        .AllowAnyMethod());
+            });
 
-			builder.Services.AddControllers();
+            builder.Services.AddControllers();
 
-			builder.Services.AddScoped<IProgressBoardService, ProgressBoardService>();
-			builder.Services.AddDbContext<TaskProgressDBContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+            builder.Services.AddScoped<IProgressBoardService, ProgressBoardService>();
 
-			builder.Services.AddEndpointsApiExplorer();
-			builder.Services.AddSwaggerGen();
+            var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")
+                                   ?? builder.Configuration.GetConnectionString("Default");
+            builder.Services.AddDbContext<TaskProgressDBContext>(options =>
+                options.UseSqlServer(connectionString));
 
-			var app = builder.Build();
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
 
-			if(app.Environment.IsDevelopment())
-			{
-				app.UseSwagger();
-				app.UseSwaggerUI();
-			}
+            builder.WebHost.ConfigureKestrel(serverOptions =>
+            {
+                serverOptions.ListenAnyIP(5000);
+            });
 
-			app.UseHttpsRedirection();
+            var app = builder.Build();
 
-			app.UseAuthorization();
-			app.UseCors();
-			app.UseCors("AllowSpecificOrigin");
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI();
+            }
 
-			app.MapControllers();
+            app.UseHttpsRedirection();
+            app.UseAuthorization();
+            app.UseCors("AllowSpecificOrigin");
 
-			app.Run();
-		}
-	}
+            app.MapControllers();
+
+            app.Run();
+        }
+    }
 }
