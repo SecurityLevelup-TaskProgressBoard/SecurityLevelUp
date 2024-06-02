@@ -105,8 +105,7 @@ async function loadTasks() {
   userTaskIds = [];
 
   // TODO: Get the actual user id
-  var uid = 1;
-  let response = await fetchWithAuth(`ProgressBoard/UserTasks/${uid}`);
+  let response = await fetchWithAuth(`ProgressBoard/UserTasks`);
   let tasks = await response.json();
   for (var task of tasks) {
     userTaskIds.push(task.taskId);
@@ -224,7 +223,7 @@ function editTask(cardSection) {
   const newTaskSection = document.getElementById("new-task-section");
 
   if (!HasNewTaskBeenClicked) {
-    NewTaskClicked(newTaskSection, true);
+    NewTaskClicked(newTaskSection, true, cardSection);
   }
   // Prepop fields
   const taskTitleField = document.getElementById("title-input");
@@ -308,6 +307,42 @@ async function postTask() {
   // Reload the board from the DB with the now updated boardId in the Tasks table (which we did in the switch)
   buildBoard();
 }
+
+async function updateTaskOnDB(cardSection){
+    const title = document.getElementById("title-input").value;
+    const description = document.getElementById("description-input").value;
+    const taskId = parseInt(cardSection.getAttribute("taskId"));
+
+    if (title == "" || description == "") {
+        return;
+    }
+    let jsonData = {
+        TaskId: taskId,
+        NewDescription: description,
+        NewName: title
+    };
+    try {
+        debugger;
+        const response = await fetchWithAuth(`ProgressBoard/UpdateTask`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(jsonData),
+        });
+        if (!response.ok) {
+        throw new Error("API error: " + response.text());
+        }
+    } catch (err) {
+        throw new Error("Frontend error: " + err.message);
+    }
+
+    // Destroy the board
+    destroyBoard();
+    // Reload the board from the DB with the now updated boardId in the Tasks table (which we did in the switch)
+    buildBoard();
+}
+
 // We could probably have used the UpdateTask function for this, but it would have required some extra logic to distiguish between a move/delete
 async function deleteTask(cardSection) {
   const taskId = parseInt(cardSection.getAttribute("taskId"));
@@ -370,7 +405,7 @@ function destroyBoard() {
   }
 }
 
-function NewTaskClicked(section, editTaskBool) {
+function NewTaskClicked(section, editTaskBool, section) {
     if (!HasNewTaskBeenClicked) {
       const backdrop = document.createElement("section");
       backdrop.classList.add("create-task-backdrop");
@@ -444,7 +479,13 @@ function NewTaskClicked(section, editTaskBool) {
       createButton.classList.add("task-create-button");
       createButton.innerText = "Create";
       createButton.onclick = function(){
-        postTask();
+        if(editTaskBool){
+            //we edit the task
+            updateTaskOnDB(section);
+
+        }else{
+            postTask();
+        }
         backdrop.remove();
         
       } 

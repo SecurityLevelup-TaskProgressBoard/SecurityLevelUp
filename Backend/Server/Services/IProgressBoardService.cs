@@ -9,5 +9,7 @@ namespace Server.Services
 		Task<bool> DeleteTask(int taskId);
 		Task<List<TaskDto>> GetUserTasks(int userId);
 		Task<TaskDto> UpdateTask(int taskId, string? newStatus, string? newDescription, string? newName);
+		Task<int> GetUserId(string email);
+
 	}
 }
