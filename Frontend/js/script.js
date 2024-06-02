@@ -5,7 +5,7 @@ let userDates = [];
 let userStatus = [];
 let userTaskIds = [];
 const LOGIN_PATH = 'https://taskify.phipson.co.za/login.html';
-const API_URL = 'https://d3gigo5ddqwqyu.cloudfront.net';//"http://api.taskify.phipson.co.za:5000/";
+const API_URL = 'https://d3gigo5ddqwqyu.cloudfront.net/';//"http://api.taskify.phipson.co.za:5000/";
 
 // ============== Config ================
 var uid = 1; // TODO: Get the correct user ID and remove hardcode from loadTasks function
