@@ -88,7 +88,7 @@ window.onload = async () => {
     await buildBoard();
 };
 
-const backendURL = "http://localhost:5000/";
+const backendURL = "http://localhost:5127/";
 
 async function fetchWithAuth(endpoint, options = {}) {
     checkToken();

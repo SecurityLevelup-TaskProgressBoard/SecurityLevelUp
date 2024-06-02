@@ -17,7 +17,7 @@ namespace Server
 			{
 				options.AddPolicy("AllowSpecificOrigin",
 					policyBuilder => policyBuilder
-						.WithOrigins("http://localhost:5500") //https://taskify.phipson.co.za
+						.WithOrigins("http://localhost:5500", "http://127.0.0.1:5500", "http://localhost:5500", "http://localhost:5500/") //https://taskify.phipson.co.za
 						.AllowAnyHeader()
 						.AllowAnyMethod());
 			});
@@ -39,19 +39,23 @@ namespace Server
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 				.AddJwtBearer(options =>
 				{
-					options.Authority = builder.Configuration["Cognito:Authority"];
-					options.Audience = builder.Configuration["Cognito:ClientId"];
+					options.Authority = Environment.GetEnvironmentVariable("Cognito_Authority");//builder.Configuration["Cognito:Authority"];
+
+					options.Audience = Environment.GetEnvironmentVariable("Cognito_ClientId");//builder.Configuration["Cognito:ClientId"];
+
 					options.TokenValidationParameters = new TokenValidationParameters
 					{
 						ValidateIssuer = true,
-						ValidIssuer = builder.Configuration["Cognito:Authority"],
-						ValidateAudience = true,
-						ValidAudience = builder.Configuration["Cognito:ClientId"],
-						ValidateIssuerSigningKey = true,
+						ValidIssuer = Environment.GetEnvironmentVariable("Cognito_Authority"),//builder.Configuration["Cognito:Authority"],
+
+                        ValidateAudience = true,
+						ValidAudience = Environment.GetEnvironmentVariable("Cognito_ClientId"),//builder.Configuration["Cognito:ClientId"],
+
+                        ValidateIssuerSigningKey = true,
 						IssuerSigningKeyResolver = (token, securityToken, kid, parameters) =>
 						{
 							// Fetch the JSON Web Key Set (JWKS) from the authority and find the matching key.
-							var jwks = GetJsonWebKeySetAsync(builder.Configuration["Cognito:Authority"]).GetAwaiter().GetResult();
+							var jwks = GetJsonWebKeySetAsync(Environment.GetEnvironmentVariable("Cognito_Authority")).GetAwaiter().GetResult();
 							return jwks.Keys.Where(k => k.KeyId == kid);
 						},
 						ValidateLifetime = true
@@ -77,15 +81,15 @@ namespace Server
 
 			app.Run();
 
-            async Task<JsonWebKeySet> GetJsonWebKeySetAsync(string authority)
-            {
-                using (var httpClient = new HttpClient())
-                {
-                    var response = await httpClient.GetStringAsync($"{authority}/.well-known/jwks.json");
-                    return new JsonWebKeySet(response);
-                }
-            }
+			async Task<JsonWebKeySet> GetJsonWebKeySetAsync(string authority)
+			{
+				using (var httpClient = new HttpClient())
+				{
+					var response = await httpClient.GetStringAsync($"{authority}/.well-known/jwks.json");
+					return new JsonWebKeySet(response);
+				}
+			}
 
-        }
+		}
     }
 }

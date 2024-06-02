@@ -20,7 +20,7 @@ namespace Server.Context
 													.AddJsonFile("appsettings.json")
 													.Build();
 				string connectionString = configuration.GetConnectionString("TPBDBConnection");
-				optionsBuilder.UseLoggerFactory(_loggerFactory)
+				optionsBuilder//.UseLoggerFactory(_loggerFactory)
 								.UseSqlServer(connectionString);
 			}
 			catch(Exception)

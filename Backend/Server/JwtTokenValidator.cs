@@ -12,9 +12,9 @@ namespace Server
         {
             _configuration = configuration;
 
-            var authority = _configuration["Cognito:Authority"];
-            var clientId = _configuration["Cognito:ClientId"];
-            var userPoolId = _configuration["Cognito:UserPoolId"];
+            var authority = Environment.GetEnvironmentVariable("Cognito_Authority");//_configuration["Cognito:Authority"];
+            var clientId = Environment.GetEnvironmentVariable("Cognito_ClientId");//_configuration["Cognito:ClientId"];
+            var userPoolId = Environment.GetEnvironmentVariable("Cognito_UserPoolId"); //_configuration["Cognito:UserPoolId"];
 
             _tokenValidationParameters = new TokenValidationParameters
             {
