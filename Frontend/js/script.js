@@ -32,8 +32,8 @@ function getTokens() {
 
         if(storedIdToken && storedAccessToken) {
             console.log("TOKENS IN SESSION STORAGE!");
-            console.log(storedIdToken);
-            console.log(storedAccessToken);
+            //console.log(storedIdToken);
+            //console.log(storedAccessToken);
         } else {
             // Tokens not found in session storage, redirect to login page
             console.log("NO TOKENS IN SESSION STORAGE!");
@@ -42,17 +42,60 @@ function getTokens() {
     }
 }
 
+//this checks to see if the token has expired or not, if so it redirects to login
+function checkToken(){
+    let token = sessionStorage.getItem('idToken');
+
+    if(!token){
+        // Redirect to login
+        window.location.href = 'https://localhost:5500/Frontend/login.html';
+        return;
+    }
+
+    // Decode the token
+    let decodedToken = parseJwt(token);
+
+    // Get the expiration time from the decoded token
+    let expirationTime = decodedToken.exp;
+    console.log(expirationTime);
+
+    // Get the current time in seconds
+    let currentTime = Math.floor(Date.now() / 1000);
+    console.log(currentTime);
+    // Check if the token has expired
+    if(currentTime >= expirationTime){
+        // Token has expired, redirect to login
+        console.log("TOKEN IS EXPIRED!");
+        window.location.href = 'https://localhost:5500/Frontend/login.html';
+        return;
+    }
+
+    // Token is still valid
+    console.log('Token is still valid');
+}
+
+// Function to parse JWT tokens
+function parseJwt(token) {
+    try {
+        return JSON.parse(atob(token.split('.')[1]));
+    } catch (e) {
+        return null;
+    }
+}
+
 window.onload = async () => {
-    //getTokens();
+    getTokens();
     await buildBoard();
 };
 
 const backendURL = "https://localhost:7033/";
 
 async function fetchWithAuth(endpoint, options = {}) {
+    checkToken();
     const headers = new Headers(options.headers || {});
     //added the token part 
     const token = sessionStorage.getItem('idToken');
+    console.log(token);
     if (token) {
         headers.set('Authorization', `Bearer ${token}`);
     }
@@ -68,15 +111,8 @@ async function fetchWithAuth(endpoint, options = {}) {
 }
 
 async function getEmail(){
-    console.log('getting email!@@@@@');
-    
     let response = await fetchWithAuth('ProgressBoard/email');
-
-    let data = await response;
-
-
-    //const response = await fetch(`${backendURL}ProgressBoard/email`);
-    //let tasks = await response.json();
+    let data = await response.text();
     console.log(data);
 }
 
@@ -90,7 +126,8 @@ async function loadTasks() {
 
   // TODO: Get the actual user id
   var uid = 1;
-  const response = await fetch(`${backendURL}ProgressBoard/UserTasks/${uid}`);
+  //const response = await fetch(`${backendURL}ProgressBoard/UserTasks/${uid}`);
+  let response = await fetchWithAuth(`ProgressBoard/UserTasks/${uid}`);
   let tasks = await response.json();
   console.log(tasks);
   for (var task of tasks) {
@@ -119,11 +156,48 @@ async function buildBoard() {
     sec.id = "card-" + String(userTaskIds[index]); // Will use later when moving and deleting
     sec.setAttribute("taskId", userTaskIds[index]);
 
-    const title = document.createElement("h2");
-    title.classList.add("card-title");
+    const headerSection = document.createElement('section');
+    headerSection.classList.add('card-header');
+
+    const title = document.createElement('h2');
+    title.classList.add('card-title');
     title.innerText = userTitles[index];
     sec.setAttribute("title", userTitles[index]);
-    sec.appendChild(title);
+    headerSection.appendChild(title);
+
+    const menuContainer = document.createElement('section');
+    menuContainer.classList.add('menu-container');
+
+    const ellipsis = document.createElement('section');
+    ellipsis.classList.add('ellipsis');
+    ellipsis.innerText = '...';
+
+    const menu = document.createElement('section');
+    menu.classList.add('menu');
+
+    const btnEdit = document.createElement('button');
+    btnEdit.classList.add('menu-item');
+    btnEdit.id = 'edit-button-' + String(userTaskIds[index]);
+    btnEdit.innerText = 'Edit';
+    btnEdit.onclick = function() {
+        editTask(document.getElementById('card-' + String(userTaskIds[index])));
+    };
+
+    const btnDelete = document.createElement('button');
+    btnDelete.classList.add('menu-item');
+    btnDelete.id = 'delete-button-' + String(userTaskIds[index]);
+    btnDelete.innerText = 'Delete';
+    btnDelete.onclick = function () {
+        deleteTask(document.getElementById("card-" + String(userTaskIds[index])));
+    };
+
+    menu.appendChild(btnEdit);
+    menu.appendChild(btnDelete);
+    menuContainer.appendChild(ellipsis);
+    menuContainer.appendChild(menu);
+    headerSection.appendChild(menuContainer);
+
+    sec.appendChild(headerSection);
 
     const description = document.createElement("p");
     description.classList.add("card-description");
@@ -131,37 +205,22 @@ async function buildBoard() {
     sec.setAttribute("description", userDescriptions[index]);
     sec.appendChild(description);
 
-    const date = document.createElement("p");
-    date.classList.add("card-date");
+    const dateSection = document.createElement('section');
+    dateSection.classList.add('date-section');
+
+    const date = document.createElement('p');
+    date.classList.add('card-date');
     date.innerText = userDates[index];
-    sec.appendChild(date);
+    dateSection.appendChild(date);
 
-    const btnMove = document.createElement("button");
-    btnMove.classList.add("card-button");
-    btnMove.id = "move-button-" + String(userTaskIds[index]); // This is a bit redundant but might be useful later
-    btnMove.innerText = "Advance";
-    btnMove.onclick = function () {
-      moveTask(document.getElementById("card-" + String(userTaskIds[index])));
-    };
-    sec.appendChild(btnMove);
+    const btnMove = document.createElement('button');
+    btnMove.classList.add('card-button');
+    btnMove.id = 'move-button-' + String(userTaskIds[index]); // This is a bit redundant but might be useful later
+    btnMove.innerText = 'Advance';
+    btnMove.onclick = function() {moveTask(document.getElementById('card-' + String(userTaskIds[index])));};
+    dateSection.appendChild(btnMove);
 
-    const btnDelete = document.createElement("button");
-    btnDelete.classList.add("card-button");
-    btnDelete.id = "delete-button-" + String(userTaskIds[index]);
-    btnDelete.innerText = "Delete";
-    btnDelete.onclick = function () {
-      deleteTask(document.getElementById("card-" + String(userTaskIds[index])));
-    };
-    sec.appendChild(btnDelete);
-
-    const btnEdit = document.createElement("button");
-    btnEdit.classList.add("card-button");
-    btnEdit.id = "edit-button-" + String(userTaskIds[index]);
-    btnEdit.innerText = "Edit";
-    btnEdit.onclick = function () {
-      editTask(document.getElementById("card-" + String(userTaskIds[index])));
-    };
-    sec.appendChild(btnEdit);
+    sec.appendChild(dateSection);
 
     // Append the card to the relevant board section via its Status (derived from boardId in Tasks table, then Status in Boards table)
     switch (userStatus[index]) {
@@ -185,14 +244,14 @@ async function buildBoard() {
         break;
     }
   }
-}
+}   
 
 function editTask(cardSection) {
   // Show new task fields
   const newTaskSection = document.getElementById("new-task-section");
 
   if (!HasNewTaskBeenClicked) {
-    NewTaskClicked(newTaskSection);
+    NewTaskClicked(newTaskSection, true);
   }
   // Prepop fields
   const taskTitleField = document.getElementById("title-input");
@@ -222,7 +281,7 @@ async function moveTask(cardSection) {
   }
   // Send PUT request
   try {
-    const response = await fetch(`${backendURL}ProgressBoard/UpdateTask`, {
+    const response = await fetchWithAuth(`ProgressBoard/UpdateTask`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -262,7 +321,7 @@ async function postTask() {
   // Send POST request
   try {
     debugger;
-    const response = await fetch(`${backendURL}ProgressBoard/AddTask`, {
+    const response = await fetchWithAuth(`ProgressBoard/AddTask`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -281,7 +340,6 @@ async function postTask() {
   // Reload the board from the DB with the now updated boardId in the Tasks table (which we did in the switch)
   buildBoard();
 }
-
 // We could probably have used the UpdateTask function for this, but it would have required some extra logic to distiguish between a move/delete
 async function deleteTask(cardSection) {
   // alert('Delete functionality blocked, undo this in "deleteTask" function');
@@ -291,7 +349,7 @@ async function deleteTask(cardSection) {
   const taskId = parseInt(cardSection.getAttribute("taskId"));
   debugger;
   // TODO: This should most likely require a body for extra authentication
-  await fetch(`${backendURL}ProgressBoard/DeleteTask/${taskId}`, {
+  await fetchWithAuth(`ProgressBoard/DeleteTask/${taskId}`, {
     method: "PUT",
   });
 
@@ -348,45 +406,91 @@ function destroyBoard() {
   }
 }
 
-function NewTaskClicked(section) {
-  if (!HasNewTaskBeenClicked) {
-    // Create section
-    const sec = document.createElement("section");
-    sec.classList.add("task-create-container");
-    sec.id = "task-create-container";
+function NewTaskClicked(section, editTaskBool) {
+    if (!HasNewTaskBeenClicked) {
+      const backdrop = document.createElement("section");
+      backdrop.classList.add("create-task-backdrop");
+      document.body.appendChild(backdrop);
+  
+      const sec = document.createElement("section");
+      sec.classList.add("task-create-container");
+      backdrop.appendChild(sec);
+  
+      const headerSection = document.createElement("section");
+      headerSection.classList.add("create-task-header-section");
+  
+      const newTaskName = document.createElement("h2");
 
-    // Create task title input field
-    const inp = document.createElement("input");
-    inp.classList.add("title-input");
-    inp.id = "title-input";
-    inp.placeholder = "Enter task title";
-    inp.type = "text";
-    inp.autocomplete = "off";
-    inp.maxLength = "50";
-    sec.appendChild(inp);
-
-    // Create task description textarea
-    const ta = document.createElement("textarea");
-    ta.classList.add("description-input");
-    ta.id = "description-input";
-    ta.placeholder = "Enter task description";
-    ta.type = "text";
-    ta.maxLength = "200";
-    sec.appendChild(ta);
-
-    // Create post button
-    const but = document.createElement("button");
-    but.classList.add("card-button");
-    but.innerText = "Post";
-    but.onclick = postTask;
-    sec.appendChild(but);
-
-    // Append the above to the section sent through as a parameter
-    section.appendChild(sec);
-    HasNewTaskBeenClicked = 1;
-  } else {
-    const sec = document.getElementById("task-create-container");
-    sec.remove();
-    HasNewTaskBeenClicked = 0;
+      if(editTaskBool){
+        newTaskName.innerText = "Edit task";
+      }else{
+        newTaskName.innerText = "Create new task";
+      }
+      
+      headerSection.appendChild(newTaskName);
+  
+      const closeButton = document.createElement("button");
+      closeButton.classList.add("close-button");
+      closeButton.innerText = "X";
+      closeButton.onclick = function() {
+        backdrop.remove();
+        HasNewTaskBeenClicked = 0;
+      };
+      headerSection.appendChild(closeButton);
+  
+      sec.appendChild(headerSection);
+  
+      const titleSection = document.createElement("section");
+      titleSection.classList.add("create-task-input-section");
+  
+      const titleSectionName = document.createElement("h3");
+      titleSectionName.innerText = "Task name";
+      titleSection.appendChild(titleSectionName);
+  
+      const titleInput = document.createElement("input");
+      titleInput.classList.add("title-input");
+      titleInput.id = "title-input";
+      titleInput.placeholder = "Enter task title";
+      titleInput.type = "text";
+      titleInput.autocomplete = "off";
+      titleInput.maxLength = "50";
+      titleSection.appendChild(titleInput);
+  
+      sec.appendChild(titleSection);
+  
+      const descriptionSection = document.createElement("section");
+      descriptionSection.classList.add("create-task-input-section");
+  
+      const descriptionSectionName = document.createElement("h3");
+      descriptionSectionName.innerText = "Task description";
+      descriptionSection.appendChild(descriptionSectionName);
+  
+      const descriptionInput = document.createElement("input");
+      descriptionInput.classList.add("description-input");
+      descriptionInput.id = "description-input";
+      descriptionInput.placeholder = "Description";
+      descriptionInput.type = "text";
+      descriptionInput.autocomplete = "off";
+      descriptionInput.maxLength = "300";
+      descriptionSection.appendChild(descriptionInput);
+  
+      sec.appendChild(descriptionSection);
+  
+      const createButton = document.createElement("button");
+      createButton.classList.add("task-create-button");
+      createButton.innerText = "Create";
+      createButton.onclick = function(){
+        postTask();
+        backdrop.remove();
+        
+      } 
+      sec.appendChild(createButton);
+  
+      HasNewTaskBeenClicked = 1;
+    } else {
+      const backdrop = document.querySelector(".create-task-backdrop");
+      backdrop.remove();
+      HasNewTaskBeenClicked = 0;
+    }
   }
-}
+  

@@ -13,9 +13,9 @@
     <title>Task Progress Manager</title>
 </head>
 <body>
-    ,<button id="email-button" onclick="getEmail()"> Get email!</button>
-    <section id="new-task-section" >
-        <button class="new-task-button" id="new-task-button" onclick="NewTaskClicked(document.getElementById('new-task-section'))">New Task</button>
+    <section class="new-task-section" id="new-task-section" >
+        <h1>My Tasks</h1>
+        <button class="new-task-button" id="new-task-button" onclick="NewTaskClicked(document.getElementById('new-task-section'), false)">New Task</button>
     </section>
     
     <section id='board-container' class="board-container">
@@ -32,8 +32,8 @@
         </section>
     </section>
 
-    <button onclick="destroyBoard()">destroy board</button>
-    <button onclick="buildBoard()">build board</button>
+    <!-- <button onclick="destroyBoard()">destroy board</button>
+    <button onclick="buildBoard()">build board</button> -->
 
 </body>
 </html>
