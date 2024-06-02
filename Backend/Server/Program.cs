@@ -4,12 +4,20 @@ using Server.Context;
 using Server.Services;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.Extensions.Options;
 
 namespace Server
 {
     public class Program
 	{
-		public static void Main(string[] args)
+        private static readonly ILoggerFactory _loggerFactory = LoggerFactory.Create(builder =>
+        {
+            builder
+            .AddConsole()
+            .AddFilter((category, level) =>
+            category == DbLoggerCategory.Database.Command.Name && level >= LogLevel.Warning);
+        });
+        public static void Main(string[] args)
 		{
 			var builder = WebApplication.CreateBuilder(args);
 
@@ -29,9 +37,9 @@ namespace Server
 			var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
 
 			builder.Services.AddDbContext<TaskProgressDBContext>(options =>
-				options.UseSqlServer(connectionString));
+				options.UseLoggerFactory(_loggerFactory).UseSqlServer(connectionString));
 
-			builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwaggerGen();
 			builder.Services.AddScoped<ITokenService, TokenService>();
 
