@@ -4,96 +4,104 @@ let userDescriptions = [];
 let userDates = [];
 let userStatus = [];
 let userTaskIds = [];
+const LOGIN_PATH = 'https://taskify.phipson.co.za/login.html';
+const API_URL = "http://api.taskify.phipson.co.za:5000/";
+
+// ============== Config ================
 var uid = 1; // TODO: Get the correct user ID and remove hardcode from loadTasks function
 
+const isDev = false; // TODO: change this if you are testing to `true`
+
+const loginPath = !isDev ? 'https://localhost:5500/Frontend/login.html' : LOGIN_PATH;
+const apiEndpoint = isDev ? 'https://localhost:5000' : API_URL;
+
+
 function getTokens() {
-    // Check if tokens are in the URL fragment
-    const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    const idToken = hashParams.get('id_token');
-    const accessToken = hashParams.get('access_token');
+  // Check if tokens are in the URL fragment
+  const hashParams = new URLSearchParams(window.location.hash.substring(1));
+  const idToken = hashParams.get('id_token');
+  const accessToken = hashParams.get('access_token');
 
-    if(idToken && accessToken) {
-        // Save tokens to session storage
-        sessionStorage.setItem('idToken', idToken);
-        sessionStorage.setItem('accessToken', accessToken);
-        // Remove tokens from URL
-        window.history.replaceState({}, document.title, window.location.pathname);
+  if (idToken && accessToken) {
+    // Save tokens to session storage
+    sessionStorage.setItem('idToken', idToken);
+    sessionStorage.setItem('accessToken', accessToken);
+    // Remove tokens from URL
+    window.history.replaceState({}, document.title, window.location.pathname);
+  } else {
+    // Tokens not found in URL, check session storage
+    const storedIdToken = sessionStorage.getItem('idToken');
+    const storedAccessToken = sessionStorage.getItem('accessToken');
+
+    if (!(storedIdToken && storedAccessToken)) {
     } else {
-        // Tokens not found in URL, check session storage
-        const storedIdToken = sessionStorage.getItem('idToken');
-        const storedAccessToken = sessionStorage.getItem('accessToken');
-
-        if(!(storedIdToken && storedAccessToken)) {
-        } else {
-            window.location.href = 'https://localhost:5500/Frontend/login.html';
-        }
+      window.location.href = loginPath;
     }
+  }
 }
 
 //this checks to see if the token has expired or not, if so it redirects to login
-function checkToken(){
-    let token = sessionStorage.getItem('idToken');
+function checkToken() {
+  let token = sessionStorage.getItem('idToken');
 
-    if(!token){
-        // Redirect to login
-        window.location.href = 'https://localhost:5500/Frontend/login.html';
-        return;
-    }
+  if (!token) {
+    // Redirect to login
+    window.location.href = loginPath;
+    return;
+  }
 
-    // Decode the token
-    let decodedToken = parseJwt(token);
+  // Decode the token
+  let decodedToken = parseJwt(token);
 
-    // Get the expiration time from the decoded token
-    let expirationTime = decodedToken.exp;
+  // Get the expiration time from the decoded token
+  let expirationTime = decodedToken.exp;
 
-    // Get the current time in seconds
-    let currentTime = Math.floor(Date.now() / 1000);
-    // Check if the token has expired
-    if(currentTime >= expirationTime){
-        // Token has expired, redirect to login
-        window.location.href = 'https://localhost:5500/Frontend/login.html';
-        return;
-    }
+  // Get the current time in seconds
+  let currentTime = Math.floor(Date.now() / 1000);
+  // Check if the token has expired
+  if (currentTime >= expirationTime) {
+    // Token has expired, redirect to login
+    window.location.href = loginPath;
+    return;
+  }
 }
 
 // Function to parse JWT tokens
 function parseJwt(token) {
-    try {
-        return JSON.parse(atob(token.split('.')[1]));
-    } catch (e) {
-        return null;
-    }
+  try {
+    return JSON.parse(atob(token.split('.')[1]));
+  } catch (e) {
+    return null;
+  }
 }
 
 window.onload = async () => {
-    getTokens();
-    await buildBoard();
+  getTokens();
+  await buildBoard();
 };
 
-const backendURL = "https://localhost:7033/";
-
 async function fetchWithAuth(endpoint, options = {}) {
-    checkToken();
-    const headers = new Headers(options.headers || {});
-    //added the token part 
-    const token = sessionStorage.getItem('idToken');
-    if (token) {
-        headers.set('Authorization', `Bearer ${token}`);
-    }
+  checkToken();
+  const headers = new Headers(options.headers || {});
+  //added the token part 
+  const token = sessionStorage.getItem('idToken');
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
 
-    let url = backendURL + endpoint;
-    let result = await fetch(url, {
-        ...options,
-        headers,
-    });
-    if (result.status == 401) {
-        alert("Error in calling BE");
-    } else return result;
+  let url = apiEndpoint + endpoint;
+  let result = await fetch(url, {
+    ...options,
+    headers,
+  });
+  if (result.status == 401) {
+    alert("Error in calling BE");
+  } else return result;
 }
 
-async function getEmail(){
-    let response = await fetchWithAuth('ProgressBoard/email');
-    let data = await response.text();
+async function getEmail() {
+  let response = await fetchWithAuth('ProgressBoard/email');
+  let data = await response.text();
 }
 
 // This will become async once we call the endpoint in here to get all the user's tasks
@@ -151,8 +159,8 @@ async function buildBoard() {
     btnEdit.classList.add('menu-item');
     btnEdit.id = 'edit-button-' + String(userTaskIds[index]);
     btnEdit.innerText = 'Edit';
-    btnEdit.onclick = function() {
-        editTask(document.getElementById('card-' + String(userTaskIds[index])));
+    btnEdit.onclick = function () {
+      editTask(document.getElementById('card-' + String(userTaskIds[index])));
     };
 
     const btnDelete = document.createElement('button');
@@ -160,7 +168,7 @@ async function buildBoard() {
     btnDelete.id = 'delete-button-' + String(userTaskIds[index]);
     btnDelete.innerText = 'Delete';
     btnDelete.onclick = function () {
-        deleteTask(document.getElementById("card-" + String(userTaskIds[index])));
+      deleteTask(document.getElementById("card-" + String(userTaskIds[index])));
     };
 
     menu.appendChild(btnEdit);
@@ -189,7 +197,7 @@ async function buildBoard() {
     btnMove.classList.add('card-button');
     btnMove.id = 'move-button-' + String(userTaskIds[index]); // This is a bit redundant but might be useful later
     btnMove.innerText = 'Advance';
-    btnMove.onclick = function() {moveTask(document.getElementById('card-' + String(userTaskIds[index])));};
+    btnMove.onclick = function () { moveTask(document.getElementById('card-' + String(userTaskIds[index]))); };
     dateSection.appendChild(btnMove);
 
     sec.appendChild(dateSection);
@@ -216,7 +224,7 @@ async function buildBoard() {
         break;
     }
   }
-}   
+}
 
 function editTask(cardSection) {
   // Show new task fields
@@ -308,39 +316,39 @@ async function postTask() {
   buildBoard();
 }
 
-async function updateTaskOnDB(cardSection){
-    const title = document.getElementById("title-input").value;
-    const description = document.getElementById("description-input").value;
-    const taskId = parseInt(cardSection.getAttribute("taskId"));
+async function updateTaskOnDB(cardSection) {
+  const title = document.getElementById("title-input").value;
+  const description = document.getElementById("description-input").value;
+  const taskId = parseInt(cardSection.getAttribute("taskId"));
 
-    if (title == "" || description == "") {
-        return;
+  if (title == "" || description == "") {
+    return;
+  }
+  let jsonData = {
+    TaskId: taskId,
+    NewDescription: description,
+    NewName: title
+  };
+  try {
+    debugger;
+    const response = await fetchWithAuth(`ProgressBoard/UpdateTask`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(jsonData),
+    });
+    if (!response.ok) {
+      throw new Error("API error: " + response.text());
     }
-    let jsonData = {
-        TaskId: taskId,
-        NewDescription: description,
-        NewName: title
-    };
-    try {
-        debugger;
-        const response = await fetchWithAuth(`ProgressBoard/UpdateTask`, {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(jsonData),
-        });
-        if (!response.ok) {
-        throw new Error("API error: " + response.text());
-        }
-    } catch (err) {
-        throw new Error("Frontend error: " + err.message);
-    }
+  } catch (err) {
+    throw new Error("Frontend error: " + err.message);
+  }
 
-    // Destroy the board
-    destroyBoard();
-    // Reload the board from the DB with the now updated boardId in the Tasks table (which we did in the switch)
-    buildBoard();
+  // Destroy the board
+  destroyBoard();
+  // Reload the board from the DB with the now updated boardId in the Tasks table (which we did in the switch)
+  buildBoard();
 }
 
 // We could probably have used the UpdateTask function for this, but it would have required some extra logic to distiguish between a move/delete
@@ -406,96 +414,96 @@ function destroyBoard() {
 }
 
 function NewTaskClicked(section, editTaskBool, section) {
-    if (!HasNewTaskBeenClicked) {
-      const backdrop = document.createElement("section");
-      backdrop.classList.add("create-task-backdrop");
-      document.body.appendChild(backdrop);
-  
-      const sec = document.createElement("section");
-      sec.classList.add("task-create-container");
-      backdrop.appendChild(sec);
-  
-      const headerSection = document.createElement("section");
-      headerSection.classList.add("create-task-header-section");
-  
-      const newTaskName = document.createElement("h2");
+  if (!HasNewTaskBeenClicked) {
+    const backdrop = document.createElement("section");
+    backdrop.classList.add("create-task-backdrop");
+    document.body.appendChild(backdrop);
 
-      if(editTaskBool){
-        newTaskName.innerText = "Edit task";
-      }else{
-        newTaskName.innerText = "Create new task";
-      }
-      
-      headerSection.appendChild(newTaskName);
-  
-      const closeButton = document.createElement("button");
-      closeButton.classList.add("close-button");
-      closeButton.innerText = "X";
-      closeButton.onclick = function() {
-        backdrop.remove();
-        HasNewTaskBeenClicked = 0;
-      };
-      headerSection.appendChild(closeButton);
-  
-      sec.appendChild(headerSection);
-  
-      const titleSection = document.createElement("section");
-      titleSection.classList.add("create-task-input-section");
-  
-      const titleSectionName = document.createElement("h3");
-      titleSectionName.innerText = "Task name";
-      titleSection.appendChild(titleSectionName);
-  
-      const titleInput = document.createElement("input");
-      titleInput.classList.add("title-input");
-      titleInput.id = "title-input";
-      titleInput.placeholder = "Enter task title";
-      titleInput.type = "text";
-      titleInput.autocomplete = "off";
-      titleInput.maxLength = "50";
-      titleSection.appendChild(titleInput);
-  
-      sec.appendChild(titleSection);
-  
-      const descriptionSection = document.createElement("section");
-      descriptionSection.classList.add("create-task-input-section");
-  
-      const descriptionSectionName = document.createElement("h3");
-      descriptionSectionName.innerText = "Task description";
-      descriptionSection.appendChild(descriptionSectionName);
-  
-      const descriptionInput = document.createElement("input");
-      descriptionInput.classList.add("description-input");
-      descriptionInput.id = "description-input";
-      descriptionInput.placeholder = "Description";
-      descriptionInput.type = "text";
-      descriptionInput.autocomplete = "off";
-      descriptionInput.maxLength = "300";
-      descriptionSection.appendChild(descriptionInput);
-  
-      sec.appendChild(descriptionSection);
-  
-      const createButton = document.createElement("button");
-      createButton.classList.add("task-create-button");
-      createButton.innerText = "Create";
-      createButton.onclick = function(){
-        if(editTaskBool){
-            //we edit the task
-            updateTaskOnDB(section);
+    const sec = document.createElement("section");
+    sec.classList.add("task-create-container");
+    backdrop.appendChild(sec);
 
-        }else{
-            postTask();
-        }
-        backdrop.remove();
-        
-      } 
-      sec.appendChild(createButton);
-  
-      HasNewTaskBeenClicked = 1;
+    const headerSection = document.createElement("section");
+    headerSection.classList.add("create-task-header-section");
+
+    const newTaskName = document.createElement("h2");
+
+    if (editTaskBool) {
+      newTaskName.innerText = "Edit task";
     } else {
-      const backdrop = document.querySelector(".create-task-backdrop");
+      newTaskName.innerText = "Create new task";
+    }
+
+    headerSection.appendChild(newTaskName);
+
+    const closeButton = document.createElement("button");
+    closeButton.classList.add("close-button");
+    closeButton.innerText = "X";
+    closeButton.onclick = function () {
       backdrop.remove();
       HasNewTaskBeenClicked = 0;
+    };
+    headerSection.appendChild(closeButton);
+
+    sec.appendChild(headerSection);
+
+    const titleSection = document.createElement("section");
+    titleSection.classList.add("create-task-input-section");
+
+    const titleSectionName = document.createElement("h3");
+    titleSectionName.innerText = "Task name";
+    titleSection.appendChild(titleSectionName);
+
+    const titleInput = document.createElement("input");
+    titleInput.classList.add("title-input");
+    titleInput.id = "title-input";
+    titleInput.placeholder = "Enter task title";
+    titleInput.type = "text";
+    titleInput.autocomplete = "off";
+    titleInput.maxLength = "50";
+    titleSection.appendChild(titleInput);
+
+    sec.appendChild(titleSection);
+
+    const descriptionSection = document.createElement("section");
+    descriptionSection.classList.add("create-task-input-section");
+
+    const descriptionSectionName = document.createElement("h3");
+    descriptionSectionName.innerText = "Task description";
+    descriptionSection.appendChild(descriptionSectionName);
+
+    const descriptionInput = document.createElement("input");
+    descriptionInput.classList.add("description-input");
+    descriptionInput.id = "description-input";
+    descriptionInput.placeholder = "Description";
+    descriptionInput.type = "text";
+    descriptionInput.autocomplete = "off";
+    descriptionInput.maxLength = "300";
+    descriptionSection.appendChild(descriptionInput);
+
+    sec.appendChild(descriptionSection);
+
+    const createButton = document.createElement("button");
+    createButton.classList.add("task-create-button");
+    createButton.innerText = "Create";
+    createButton.onclick = function () {
+      if (editTaskBool) {
+        //we edit the task
+        updateTaskOnDB(section);
+
+      } else {
+        postTask();
+      }
+      backdrop.remove();
+
     }
+    sec.appendChild(createButton);
+
+    HasNewTaskBeenClicked = 1;
+  } else {
+    const backdrop = document.querySelector(".create-task-backdrop");
+    backdrop.remove();
+    HasNewTaskBeenClicked = 0;
   }
-  
+}
+
