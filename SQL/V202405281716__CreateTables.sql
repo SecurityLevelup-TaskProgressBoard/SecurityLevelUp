@@ -1,7 +1,6 @@
 CREATE TABLE [Users] (
   [UserId] int IDENTITY(1,1) NOT NULL PRIMARY KEY,
   [UserName] nvarchar(255) NOT NULL,
-  [IconURL] nvarchar(255) NOT NULL
 );
 
 CREATE TABLE [Boards] (
