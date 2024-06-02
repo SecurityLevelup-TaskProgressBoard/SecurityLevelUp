@@ -39,24 +39,22 @@ namespace Server
 			builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 				.AddJwtBearer(options =>
 				{
-					options.Authority = Environment.GetEnvironmentVariable("Cognito_Authority");//builder.Configuration["Cognito:Authority"];
+					options.Authority = Environment.GetEnvironmentVariable("Cognito_Authority");
 
-					options.Audience = Environment.GetEnvironmentVariable("Cognito_ClientId");//builder.Configuration["Cognito:ClientId"];
+					options.Audience = Environment.GetEnvironmentVariable("Cognito_ClientId");
 
 					options.TokenValidationParameters = new TokenValidationParameters
 					{
 						ValidateIssuer = true,
-						ValidIssuer = Environment.GetEnvironmentVariable("Cognito_Authority"),//builder.Configuration["Cognito:Authority"],
+						ValidIssuer = Environment.GetEnvironmentVariable("Cognito_Authority"),
 
 						ValidateAudience = true,
-						ValidAudience = Environment.GetEnvironmentVariable("Cognito_ClientId"),//builder.Configuration["Cognito:ClientId"],
+						ValidAudience = Environment.GetEnvironmentVariable("Cognito_ClientId"),
 
 						ValidateIssuerSigningKey = true,
 						IssuerSigningKeyResolver = (token, securityToken, kid, parameters) =>
 						{
 							// Fetch the JSON Web Key Set (JWKS) from the authority and find the matching key.
-							//var jwks = GetJsonWebKeySetAsync(Environment.GetEnvironmentVariable("Cognito_Authority")).GetAwaiter().GetResult();
-							//return jwks.Keys.Where(k => k.KeyId == kid);
 							var jwks = GetJsonWebKeySetAsync().GetAwaiter().GetResult();
 							return jwks.Keys.Where(k => k.KeyId == kid);
 						},
@@ -83,20 +81,9 @@ namespace Server
 
 			app.Run();
 
-			//async Task<JsonWebKeySet> GetJsonWebKeySetAsync()
-			//{
-			//	var authority = Environment.GetEnvironmentVariable("Cognito_Authority");
-   //             using (var httpClient = new HttpClient())
-			//	{
-			//		var response = await httpClient.GetStringAsync($"{authority}/.well-known/jwks.json");
-			//		return new JsonWebKeySet(response);
-			//	}
-			//}
-
             async Task<JsonWebKeySet> GetJsonWebKeySetAsync()
             {
                 var authority = Environment.GetEnvironmentVariable("Cognito_Authority");
-                //var authority = $"https://{Environment.GetEnvironmentVariable("Cognito_Authority")}";
                 using (var httpClient = new HttpClient())
                 {
                     var response = await httpClient.GetStringAsync($"{authority}/.well-known/jwks.json");

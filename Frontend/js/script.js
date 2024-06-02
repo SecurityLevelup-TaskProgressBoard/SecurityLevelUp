@@ -13,27 +13,18 @@ function getTokens() {
     const accessToken = hashParams.get('access_token');
 
     if(idToken && accessToken) {
-        console.log("THERE BE TOKENS");
         // Save tokens to session storage
         sessionStorage.setItem('idToken', idToken);
         sessionStorage.setItem('accessToken', accessToken);
         // Remove tokens from URL
         window.history.replaceState({}, document.title, window.location.pathname);
-
-        // Redirect to a different page
-        // window.location.href = 'https://localhost:5500/Frontend/index.html';
     } else {
         // Tokens not found in URL, check session storage
         const storedIdToken = sessionStorage.getItem('idToken');
         const storedAccessToken = sessionStorage.getItem('accessToken');
 
-        if(storedIdToken && storedAccessToken) {
-            console.log("TOKENS IN SESSION STORAGE!");
-            //console.log(storedIdToken);
-            //console.log(storedAccessToken);
+        if(!(storedIdToken && storedAccessToken)) {
         } else {
-            // Tokens not found in session storage, redirect to login page
-            console.log("NO TOKENS IN SESSION STORAGE!");
             window.location.href = 'https://localhost:5500/Frontend/login.html';
         }
     }
@@ -54,21 +45,15 @@ function checkToken(){
 
     // Get the expiration time from the decoded token
     let expirationTime = decodedToken.exp;
-    console.log(expirationTime);
 
     // Get the current time in seconds
     let currentTime = Math.floor(Date.now() / 1000);
-    console.log(currentTime);
     // Check if the token has expired
     if(currentTime >= expirationTime){
         // Token has expired, redirect to login
-        console.log("TOKEN IS EXPIRED!");
         window.location.href = 'https://localhost:5500/Frontend/login.html';
         return;
     }
-
-    // Token is still valid
-    console.log('Token is still valid');
 }
 
 // Function to parse JWT tokens
@@ -85,7 +70,7 @@ window.onload = async () => {
     await buildBoard();
 };
 
-const backendURL = "https://localhost:7033/";//"http://localhost:5127/";
+const backendURL = "https://localhost:7033/";
 
 async function fetchWithAuth(endpoint, options = {}) {
     checkToken();
@@ -109,7 +94,6 @@ async function fetchWithAuth(endpoint, options = {}) {
 async function getEmail(){
     let response = await fetchWithAuth('ProgressBoard/email');
     let data = await response.text();
-    console.log(data);
 }
 
 // This will become async once we call the endpoint in here to get all the user's tasks
@@ -122,10 +106,8 @@ async function loadTasks() {
 
   // TODO: Get the actual user id
   var uid = 1;
-  //const response = await fetch(`${backendURL}ProgressBoard/UserTasks/${uid}`);
   let response = await fetchWithAuth(`ProgressBoard/UserTasks/${uid}`);
   let tasks = await response.json();
-  console.log(tasks);
   for (var task of tasks) {
     userTaskIds.push(task.taskId);
     userStatus.push(task.status);
@@ -133,11 +115,6 @@ async function loadTasks() {
     userTitles.push(task.taskName);
     userDescriptions.push(task.taskDescription);
   }
-  console.log(userTitles);
-  console.log(userDescriptions);
-  console.log(userDates);
-  console.log(userStatus);
-  console.log(userTaskIds);
 }
 
 async function buildBoard() {
@@ -263,7 +240,6 @@ async function moveTask(cardSection) {
   switch (boardId) {
     case "TODO":
       // Update the boardId in the 'Tasks' table from 1 to 2
-      // TODO: Call endpoint to just update the boardId of the relevant taskId. Something like /api/v1/updateStatus/{taskId}/{newStatus}
       jsonData = { taskId: taskId, newStatus: "IN PROGRESS" };
       break;
     case "IN PROGRESS":
@@ -297,14 +273,11 @@ async function moveTask(cardSection) {
 }
 
 async function postTask() {
-  // TODO: Put lots of validation in here (like lengths, looking for '--', "'" etc.)
-
   const title = document.getElementById("title-input").value;
   const description = document.getElementById("description-input").value;
   if (title == "" || description == "") {
     return;
   }
-  console.log("Title: " + title + " Description: " + description);
   let jsonData = {
     taskId: 0,
     userId: uid,
@@ -314,7 +287,6 @@ async function postTask() {
     date: new Date().toISOString(),
     deleted: false,
   };
-  // Send POST request
   try {
     debugger;
     const response = await fetchWithAuth(`ProgressBoard/AddTask`, {
@@ -338,10 +310,6 @@ async function postTask() {
 }
 // We could probably have used the UpdateTask function for this, but it would have required some extra logic to distiguish between a move/delete
 async function deleteTask(cardSection) {
-  // alert('Delete functionality blocked, undo this in "deleteTask" function');
-  // ********************
-  // return; // DEBUG CODE, to prevent accidental deletions
-  // ********************
   const taskId = parseInt(cardSection.getAttribute("taskId"));
   debugger;
   // TODO: This should most likely require a body for extra authentication
