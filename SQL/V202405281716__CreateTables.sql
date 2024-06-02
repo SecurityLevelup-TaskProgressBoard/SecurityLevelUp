@@ -1,11 +1,11 @@
 CREATE TABLE [Users] (
   [UserId] int IDENTITY(1,1) NOT NULL PRIMARY KEY,
-  [UserName] nvarchar(255) NOT NULL,
+  [UserName] nvarchar(255) NOT NULL
 );
 
 CREATE TABLE [Boards] (
   [BoardId] int IDENTITY(1,1) NOT NULL PRIMARY KEY,
-  [Status] nvarchar(255) NOT NULL,
+  [Status] nvarchar(255) NOT NULL
 );
 
 CREATE TABLE [Tasks] (
