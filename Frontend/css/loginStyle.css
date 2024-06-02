@@ -1,0 +1,69 @@
+*{
+    font-family: "Poppins", sans-serif;
+}
+
+h1{
+    font-weight: 700;
+}
+
+body {
+    background-image: url("../assets/pattern.png");
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #f0efeb;
+    overflow: hidden;
+    container-type: size;
+    margin: 0%;
+    height: 100dvh;
+
+}
+
+.login-container{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    overflow: auto;
+    height: 75vh;
+    margin: auto;
+    width: 80%; /* Adjusted to use percentage for dynamic resizing */
+    max-width: 30rem; /* Maximum width to prevent it from getting too wide */
+    background-color: rgb(255, 255, 255);
+    border-radius: 5%;
+    justify-content: space-around;
+    align-items: center;
+    box-shadow: 0rem 0rem 0.5rem rgb(72 72 72 / 59%);
+
+}
+
+.login-button{
+    border-radius: 0.5rem;
+    width: 80%; /* Relative width */
+    max-width: 15rem; /* Maximum width */
+    min-width: 5rem; /* Minimum width to avoid being too small */
+    height: 2.5rem;
+    font-weight: 400;
+    font-size: larger;
+    border-style: solid;
+    background-color: #7CB0B7;
+    color: white;
+    transition: width 0.3s ease; /* Smooth resizing */
+}
+
+.login-button:hover{
+    background-color: #64939a;
+}
+
+.login-heading{
+    font-weight: 600;
+    font-size: clamp(2rem, 3vw, 3rem);/* Adjust based on viewport width */
+    color: #333; /* Example color */
+    margin: 0.5rem 0; /* Example margin */
+    transition: font-size 0.3s ease; /* Smooth resizing */
+}
+
+.logo-section{
+    text-align: center;
+}
+

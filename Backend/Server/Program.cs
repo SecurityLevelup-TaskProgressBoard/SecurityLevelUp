@@ -1,10 +1,13 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Server.Context;
 using Server.Services;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Server
 {
-	public class Program
+    public class Program
 	{
 		public static void Main(string[] args)
 		{
@@ -14,7 +17,7 @@ namespace Server
 			{
 				options.AddPolicy("AllowSpecificOrigin",
 					policyBuilder => policyBuilder
-						.WithOrigins("http://localhost:5500") //https://taskify.phipson.co.za
+						.WithOrigins("http://localhost:5500", "http://127.0.0.1:5500", "http://localhost:5500", "http://localhost:5500/") //https://taskify.phipson.co.za
 						.AllowAnyHeader()
 						.AllowAnyMethod());
 			});
@@ -30,11 +33,34 @@ namespace Server
 
 			builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwaggerGen();
+			builder.Services.AddScoped<ITokenService, TokenService>();
 
-			builder.WebHost.ConfigureKestrel(serverOptions =>
-			{
-				serverOptions.ListenAnyIP(5000);
-			});
+
+			builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+				.AddJwtBearer(options =>
+				{
+					options.Authority = Environment.GetEnvironmentVariable("Cognito_Authority");
+
+					options.Audience = Environment.GetEnvironmentVariable("Cognito_ClientId");
+
+					options.TokenValidationParameters = new TokenValidationParameters
+					{
+						ValidateIssuer = true,
+						ValidIssuer = Environment.GetEnvironmentVariable("Cognito_Authority"),
+
+						ValidateAudience = true,
+						ValidAudience = Environment.GetEnvironmentVariable("Cognito_ClientId"),
+
+						ValidateIssuerSigningKey = true,
+						IssuerSigningKeyResolver = (token, securityToken, kid, parameters) =>
+						{
+							// Fetch the JSON Web Key Set (JWKS) from the authority and find the matching key.
+							var jwks = GetJsonWebKeySetAsync().GetAwaiter().GetResult();
+							return jwks.Keys.Where(k => k.KeyId == kid);
+						},
+						ValidateLifetime = true
+					};
+				});
 
 			var app = builder.Build();
 
@@ -45,12 +71,26 @@ namespace Server
 			}
 
 			app.UseHttpsRedirection();
-			app.UseAuthorization();
+			app.UseCors();
 			app.UseCors("AllowSpecificOrigin");
+			app.UseAuthentication(); // Ensure this comes before UseAuthorization
+			app.UseAuthorization();
+
 
 			app.MapControllers();
 
 			app.Run();
-		}
+
+            async Task<JsonWebKeySet> GetJsonWebKeySetAsync()
+            {
+                var authority = Environment.GetEnvironmentVariable("Cognito_Authority");
+                using (var httpClient = new HttpClient())
+                {
+                    var response = await httpClient.GetStringAsync($"{authority}/.well-known/jwks.json");
+                    return new JsonWebKeySet(response);
+                }
+            }
+
+        }
 	}
 }
