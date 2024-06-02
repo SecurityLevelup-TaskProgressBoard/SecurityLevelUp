@@ -17,9 +17,6 @@ function getTokens() {
         // Save tokens to session storage
         sessionStorage.setItem('idToken', idToken);
         sessionStorage.setItem('accessToken', accessToken);
-
-        console.log(sessionStorage.getItem('idToken'));
-        console.log(sessionStorage.getItem('accessToken'));
         // Remove tokens from URL
         window.history.replaceState({}, document.title, window.location.pathname);
 
@@ -95,7 +92,6 @@ async function fetchWithAuth(endpoint, options = {}) {
     const headers = new Headers(options.headers || {});
     //added the token part 
     const token = sessionStorage.getItem('idToken');
-    console.log(token);
     if (token) {
         headers.set('Authorization', `Bearer ${token}`);
     }
