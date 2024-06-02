@@ -51,6 +51,18 @@ namespace Server.Controllers
 
 		}
 
+		[HttpGet("ping")]
+		public async Task<IActionResult> Ping(int UserId)
+		{
+			var response = new
+			{
+				reply = "pong",
+				easterEgg = "Chuqin Wang"
+			};
+
+			return Ok(response);
+		}
+
 		[Authorize]
 		[HttpPut("UpdateTask")]
 		public async Task<IActionResult> UpdateTask([FromBody] TaskUpdate taskUpdate)
@@ -90,7 +102,7 @@ namespace Server.Controllers
 				var result = await _progressBoardService.DeleteTask(TaskId);
 				return Ok(result);
 			}
-			catch (Exception ex)
+			catch  (Exception ex)
 			{
 				return BadRequest(ex.Message);
 			}
