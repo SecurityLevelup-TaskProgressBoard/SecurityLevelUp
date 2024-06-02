@@ -8,16 +8,16 @@ using Microsoft.Extensions.Options;
 
 namespace Server
 {
-    public class Program
+	public class Program
 	{
-        private static readonly ILoggerFactory _loggerFactory = LoggerFactory.Create(builder =>
-        {
-            builder
-            .AddConsole()
-            .AddFilter((category, level) =>
-            category == DbLoggerCategory.Database.Command.Name && level >= LogLevel.Warning);
-        });
-        public static void Main(string[] args)
+		private static readonly ILoggerFactory _loggerFactory = LoggerFactory.Create(builder =>
+		{
+			builder
+			.AddConsole()
+			.AddFilter((category, level) =>
+			category == DbLoggerCategory.Database.Command.Name && level >= LogLevel.Warning);
+		});
+		public static void Main(string[] args)
 		{
 			var builder = WebApplication.CreateBuilder(args);
 
@@ -25,7 +25,7 @@ namespace Server
 			{
 				options.AddPolicy("AllowSpecificOrigin",
 					policyBuilder => policyBuilder
-						.WithOrigins("http://localhost:5500", "http://127.0.0.1:5500", "http://localhost:5500", "http://localhost:5500/") //https://taskify.phipson.co.za
+						.WithOrigins("http://localhost:5500", "http://127.0.0.1:5500", "http://localhost:5500", "http://localhost:5500/", "https://taskify.phipson.co.za") // TODO REMOVE whats not needed
 						.AllowAnyHeader()
 						.AllowAnyMethod());
 			});
@@ -39,7 +39,7 @@ namespace Server
 			builder.Services.AddDbContext<TaskProgressDBContext>(options =>
 				options.UseLoggerFactory(_loggerFactory).UseSqlServer(connectionString));
 
-            builder.Services.AddEndpointsApiExplorer();
+			builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwaggerGen();
 			builder.Services.AddScoped<ITokenService, TokenService>();
 
@@ -89,16 +89,16 @@ namespace Server
 
 			app.Run();
 
-            async Task<JsonWebKeySet> GetJsonWebKeySetAsync()
-            {
-                var authority = Environment.GetEnvironmentVariable("Cognito_Authority");
-                using (var httpClient = new HttpClient())
-                {
-                    var response = await httpClient.GetStringAsync($"{authority}/.well-known/jwks.json");
-                    return new JsonWebKeySet(response);
-                }
-            }
+			async Task<JsonWebKeySet> GetJsonWebKeySetAsync()
+			{
+				var authority = Environment.GetEnvironmentVariable("Cognito_Authority");
+				using (var httpClient = new HttpClient())
+				{
+					var response = await httpClient.GetStringAsync($"{authority}/.well-known/jwks.json");
+					return new JsonWebKeySet(response);
+				}
+			}
 
-        }
+		}
 	}
 }
