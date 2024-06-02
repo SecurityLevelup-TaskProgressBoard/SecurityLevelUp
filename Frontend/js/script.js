@@ -12,7 +12,7 @@ var uid = 1; // TODO: Get the correct user ID and remove hardcode from loadTasks
 
 const isDev = false; // TODO: change this if you are testing to `true`
 
-const loginPath = !isDev ? 'https://localhost:5500/Frontend/login.html' : LOGIN_PATH;
+const loginPath = isDev ? 'https://localhost:5500/Frontend/login.html' : LOGIN_PATH;
 const apiEndpoint = isDev ? 'https://localhost:5000' : API_URL;
 
 
