@@ -26,41 +26,17 @@ namespace Server.Controllers
 			_tokenService = tokenService;
 		}
 
-        [HttpGet("email")]
-        public IActionResult GetEmail()
-        {
-            var email = _tokenService.GetEmail(User);
-            return Ok(new { Email = email });
-        }
-
+       
         [Authorize]
-        [HttpGet("addUser/{UserId}")]
-        public async Task<IActionResult> GetUserTasks(int UserId)
-        {
-            try
-            {
-                var email = _tokenService.GetEmail(User);
-				var userId = await _progressBoardService.GetUserIdTask(email);
-
-                //var result = await _progressBoardService.GetUserTasks(UserId);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-
-
-        }
-
-        [Authorize]
-		[HttpGet("UserTasks/{UserId}")]
-		public async Task<IActionResult> GetUserTasks(int UserId)
+		[HttpGet("UserTasks")]
+		public async Task<IActionResult> GetUserTasks()
 		{
 			try
 			{
-				var email = _tokenService.GetEmail(User);
-				var result = await _progressBoardService.GetUserTasks(UserId);
+                var email = _tokenService.GetEmail(User);
+                var userId = await _progressBoardService.GetUserId(email);
+
+                var result = await _progressBoardService.GetUserTasks(userId);
 				return Ok(result);
 			}
 			catch (Exception ex)
@@ -74,7 +50,8 @@ namespace Server.Controllers
 		[HttpGet("ping")]
 		public async Task<IActionResult> Ping(int UserId)
 		{
-			var response = new
+           
+            var response = new
 			{
 				reply = "pong",
 				easterEgg = "Chuqin Wang"
@@ -89,6 +66,7 @@ namespace Server.Controllers
 		{
 			try
 			{
+
 				var result = await _progressBoardService.UpdateTask(taskUpdate.TaskId, taskUpdate.NewStatus, taskUpdate.NewDescription, taskUpdate.NewName);
 				return Ok(result);
 			}
@@ -104,7 +82,10 @@ namespace Server.Controllers
 		{
 			try
 			{
-				var result = await _progressBoardService.AddTask(newTask);
+                var email = _tokenService.GetEmail(User);
+                var userId = await _progressBoardService.GetUserId(email);
+				newTask.UserId = userId;
+                var result = await _progressBoardService.AddTask(newTask);
 				return Ok(result);
 			}
 			catch (Exception ex)
@@ -119,7 +100,7 @@ namespace Server.Controllers
 		{
 			try
 			{
-				var result = await _progressBoardService.DeleteTask(TaskId);
+                var result = await _progressBoardService.DeleteTask(TaskId);
 				return Ok(result);
 			}
 			catch  (Exception ex)

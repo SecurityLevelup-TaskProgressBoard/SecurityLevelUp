@@ -105,8 +105,7 @@ async function loadTasks() {
   userTaskIds = [];
 
   // TODO: Get the actual user id
-  var uid = 1;
-  let response = await fetchWithAuth(`ProgressBoard/UserTasks/${uid}`);
+  let response = await fetchWithAuth(`ProgressBoard/UserTasks`);
   let tasks = await response.json();
   for (var task of tasks) {
     userTaskIds.push(task.taskId);

@@ -14,6 +14,22 @@ namespace Server.Services
 			_progressDBContext = progressDBContext;
 		}
 
+		public async Task<int> GetUserId(string email)
+		{
+            var userId = await _progressDBContext.Users
+                .FirstOrDefaultAsync(t => t.UserName == email);
+
+			if (userId == null)
+			{
+				var user = new User() { UserName = email };
+				_progressDBContext.Users.Add(user);
+				await _progressDBContext.SaveChangesAsync();
+				return user.UserId;
+			}  
+
+            return userId.UserId;
+        }
+
 		public async Task<List<TaskDto>> GetUserTasks(int userId)
 		{
 			var userTasks = await _progressDBContext.Tasks
@@ -71,7 +87,6 @@ namespace Server.Services
 		public async Task<TaskDto> AddTask(TaskDto newTaskDto)
 		{
 			var newTask = TaskDtoToTaskModel(newTaskDto);
-			newTask.UserId = 1;
 			newTask.Deleted = false;
 
 			var boardToAddTo = await _progressDBContext.Boards
