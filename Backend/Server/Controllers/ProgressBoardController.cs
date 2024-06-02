@@ -34,6 +34,26 @@ namespace Server.Controllers
         }
 
         [Authorize]
+        [HttpGet("addUser/{UserId}")]
+        public async Task<IActionResult> GetUserTasks(int UserId)
+        {
+            try
+            {
+                var email = _tokenService.GetEmail(User);
+				var userId = await _progressBoardService.GetUserIdTask(email);
+
+                //var result = await _progressBoardService.GetUserTasks(UserId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+
+        }
+
+        [Authorize]
 		[HttpGet("UserTasks/{UserId}")]
 		public async Task<IActionResult> GetUserTasks(int UserId)
 		{
