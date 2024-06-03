@@ -1,39 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" type="text/css" href="css/styles.css" />
-    <script src="js/script.js" defer></script>
+    <script type="module" src="js/script.js" defer></script>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-        
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+      rel="stylesheet"
+    />
+
     <title>Task Progress Manager</title>
-</head>
-<body>
-    <section class="new-task-section" id="new-task-section" >
-        <h1>My Tasks</h1>
-        <button class="new-task-button" id="new-task-button" onclick="NewTaskClicked(document.getElementById('new-task-section'), false)">New Task</button>
+  </head>
+  <body>
+    <section class="new-task-section" id="new-task-section">
+      <h1>My Tasks</h1>
+      <button class="new-task-button" id="new-task-button">New Task</button>
     </section>
-    
-    <section id='board-container' class="board-container">
-        <section id='to-do-board' class="board">
-            <h2 class="board-heading">ToDo</h2>
-        </section>
 
-        <section id='in-progress-board' class="board">
-            <h2 class="board-heading">In Progress</h2>
-         </section>
-        
-        <section id='done-board' class="board">
-            <h2 class="board-heading">Done</h2>
-        </section>
+    <section id="board-container" class="board-container">
+      <section id="to-do-board" class="board">
+        <h2 class="board-heading">ToDo</h2>
+      </section>
+
+      <section id="in-progress-board" class="board">
+        <h2 class="board-heading">In Progress</h2>
+      </section>
+
+      <section id="done-board" class="board">
+        <h2 class="board-heading">Done</h2>
+      </section>
     </section>
 
     <!-- <button onclick="destroyBoard()">destroy board</button>
     <button onclick="buildBoard()">build board</button> -->
-
-</body>
+  </body>
 </html>

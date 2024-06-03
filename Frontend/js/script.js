@@ -1,19 +1,16 @@
+import { LOGIN_PATH, API_URL } from "./config.js";
+
 var HasNewTaskBeenClicked = 0;
-let userTitles = [];
-let userDescriptions = [];
-let userDates = [];
-let userStatus = [];
-let userTaskIds = [];
-const LOGIN_PATH = 'https://taskify.phipson.co.za/login.html';
-const API_URL = 'https://d2w0hjrwcifnrg.cloudfront.net/'; //"http://api.taskify.phipson.co.za:5000/";
+
+document.getElementById('new-task-button').addEventListener('click', function () {
+  NewTaskClicked(false, null);
+});
 
 // ============== Config ================
 var uid = 1; // TODO: Get the correct user ID and remove hardcode from loadTasks function
 
-const isDev = true; // TODO: change this if you are testing to `true`
-
-const loginPath = isDev ? 'https://localhost:5500/login.html' : LOGIN_PATH;
-const apiEndpoint = isDev ? 'https://localhost:5000' : API_URL;
+const loginPath = LOGIN_PATH;
+const apiEndpoint = API_URL;
 
 
 function getTokens() {
@@ -106,11 +103,11 @@ async function getEmail() {
 
 // This will become async once we call the endpoint in here to get all the user's tasks
 async function loadTasks() {
-  userTitles = [];
-  userDescriptions = [];
-  userDates = [];
-  userStatus = [];
-  userTaskIds = [];
+  let userTitles = [];
+  let userDescriptions = [];
+  let userDates = [];
+  let userStatus = [];
+  let userTaskIds = [];
 
   // TODO: Get the actual user id
   let response = await fetchWithAuth(`ProgressBoard/UserTasks`);
@@ -122,13 +119,14 @@ async function loadTasks() {
     userTitles.push(task.taskName);
     userDescriptions.push(task.taskDescription);
   }
+  return { userTitles, userDescriptions, userDates, userStatus, userTaskIds };
 }
 
 async function buildBoard() {
-  // Clear board for when cards already exists
   destroyBoard();
+
   // Load all tasks
-  await loadTasks();
+  let { userTitles, userDescriptions, userDates, userStatus, userTaskIds } = await loadTasks();
 
   for (let index = 0; index < userTaskIds.length; index++) {
     const sec = document.createElement("section");
@@ -227,11 +225,8 @@ async function buildBoard() {
 }
 
 function editTask(cardSection) {
-  // Show new task fields
-  const newTaskSection = document.getElementById("new-task-section");
-
   if (!HasNewTaskBeenClicked) {
-    NewTaskClicked(newTaskSection, true, cardSection);
+    NewTaskClicked(true, cardSection);
   }
   // Prepop fields
   const taskTitleField = document.getElementById("title-input");
@@ -273,10 +268,9 @@ async function moveTask(cardSection) {
   } catch (err) {
     throw new Error("Frontend error: " + err.message);
   }
-  // Destroy the board
-  destroyBoard();
+
   // Reload the board from the DB with the now updated boardId in the Tasks table (which we did in the switch)
-  buildBoard();
+  await buildBoard();
 }
 
 async function postTask() {
@@ -369,10 +363,10 @@ function destroyBoard() {
     // Remove board
     board.remove();
     // Rebuild board
-    newBoard = document.createElement("section");
+    let newBoard = document.createElement("section");
     newBoard.classList.add("board");
     newBoard.id = "to-do-board";
-    newBoardHeading = document.createElement("h2");
+    let newBoardHeading = document.createElement("h2");
     newBoardHeading.classList.add("board-heading");
     newBoardHeading.innerText = "ToDo";
     newBoard.appendChild(newBoardHeading);
@@ -384,10 +378,10 @@ function destroyBoard() {
   board = document.getElementById("in-progress-board");
   if (board) {
     board.remove();
-    newBoard = document.createElement("section");
+    let newBoard = document.createElement("section");
     newBoard.classList.add("board");
     newBoard.id = "in-progress-board";
-    newBoardHeading = document.createElement("h2");
+    let newBoardHeading = document.createElement("h2");
     newBoardHeading.classList.add("board-heading");
     newBoardHeading.innerText = "In Progress";
     newBoard.appendChild(newBoardHeading);
@@ -398,10 +392,10 @@ function destroyBoard() {
   board = document.getElementById("done-board");
   if (board) {
     board.remove();
-    newBoard = document.createElement("section");
+    let newBoard = document.createElement("section");
     newBoard.classList.add("board");
     newBoard.id = "done-board";
-    newBoardHeading = document.createElement("h2");
+    let newBoardHeading = document.createElement("h2");
     newBoardHeading.classList.add("board-heading");
     newBoardHeading.innerText = "Done";
     newBoard.appendChild(newBoardHeading);
@@ -410,8 +404,9 @@ function destroyBoard() {
   }
 }
 
-function NewTaskClicked(section, editTaskBool, section) {
+function NewTaskClicked(editTaskBool, cardSection) {
   if (!HasNewTaskBeenClicked) {
+    HasNewTaskBeenClicked = 1;
     const backdrop = document.createElement("section");
     backdrop.classList.add("create-task-backdrop");
     document.body.appendChild(backdrop);
@@ -486,7 +481,7 @@ function NewTaskClicked(section, editTaskBool, section) {
     createButton.onclick = function () {
       if (editTaskBool) {
         //we edit the task
-        updateTaskOnDB(section);
+        updateTaskOnDB(cardSection);
 
       } else {
         postTask();
@@ -496,7 +491,7 @@ function NewTaskClicked(section, editTaskBool, section) {
     }
     sec.appendChild(createButton);
 
-    HasNewTaskBeenClicked = 1;
+    HasNewTaskBeenClicked = 0;
   } else {
     const backdrop = document.querySelector(".create-task-backdrop");
     backdrop.remove();
