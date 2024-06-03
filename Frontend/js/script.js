@@ -512,8 +512,15 @@ function NewTaskClicked(editTaskBool, cardSection) {
     createButton.onclick = function () {
       if (!editTaskBool && (!titleInput.value || !descriptionInput.value)) {
         //alert("Please fill in both the title and description.");
-        descriptionInput.classList.add("create-task-input-error");
-        titleInput.classList.add("create-task-input-error");
+        if(!titleInput.value){
+          titleInput.classList.add("create-task-input-error");
+        }
+
+        if(!descriptionInput.value){
+          descriptionInput.classList.add("create-task-input-error");
+        }
+        
+        
       }else{
         if (editTaskBool) {
           //we edit the task
