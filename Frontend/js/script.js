@@ -58,7 +58,11 @@ function checkToken() {
   // Check if the token has expired
   if (currentTime >= expirationTime) {
     // Token has expired, redirect to login
-    window.location.href = loginPath;
+
+    const params = new URLSearchParams();
+    params.append('expired', 'true');
+    const loginUrlWithParams = `${loginPath}?${params.toString()}`;
+    window.location.href = loginUrlWithParams;
     return;
   }
 }
@@ -92,13 +96,11 @@ async function fetchWithAuth(endpoint, options = {}) {
     headers,
   });
   if (result.status == 401) {
-    alert("Error in calling BE");
+    const params = new URLSearchParams();
+    params.append('unauthorized', 'true');
+    const loginUrlWithParams = `${loginPath}?${params.toString()}`;
+    window.location.href = loginUrlWithParams;
   } else return result;
-}
-
-async function getEmail() {
-  let response = await fetchWithAuth('ProgressBoard/email');
-  let data = await response.text();
 }
 
 // This will become async once we call the endpoint in here to get all the user's tasks
@@ -195,7 +197,18 @@ async function buildBoard() {
     btnMove.classList.add('card-button');
     btnMove.id = 'move-button-' + String(userTaskIds[index]); // This is a bit redundant but might be useful later
     btnMove.innerText = 'Advance';
-    btnMove.onclick = function () { moveTask(document.getElementById('card-' + String(userTaskIds[index]))); };
+    btnMove.onclick = function () { 
+      //moveTask(document.getElementById('card-' + String(userTaskIds[index]))); 
+
+      btnMove.disabled = true;
+      try {
+        // Execute the task
+       moveTask(document.getElementById('card-' + String(userTaskIds[index])));
+      } catch (error) {
+        console.error('An error occurred while moving the task:', error);
+        btnMove.disabled = false;
+      } 
+    };
     dateSection.appendChild(btnMove);
 
     sec.appendChild(dateSection);
@@ -453,6 +466,12 @@ function NewTaskClicked(editTaskBool, cardSection) {
     titleInput.type = "text";
     titleInput.autocomplete = "off";
     titleInput.maxLength = "50";
+
+    // Conditionally set the required attribute
+    if (!editTaskBool) {
+      titleInput.required = true;
+    }
+
     titleSection.appendChild(titleInput);
 
     sec.appendChild(titleSection);
@@ -471,23 +490,41 @@ function NewTaskClicked(editTaskBool, cardSection) {
     descriptionInput.type = "text";
     descriptionInput.autocomplete = "off";
     descriptionInput.maxLength = "300";
+
+    // Conditionally set the required attribute
+    if (!editTaskBool) {
+      descriptionInput.required = true;
+    }
+
     descriptionSection.appendChild(descriptionInput);
 
     sec.appendChild(descriptionSection);
 
     const createButton = document.createElement("button");
     createButton.classList.add("task-create-button");
-    createButton.innerText = "Create";
+    if(editTaskBool){
+      createButton.innerText = "Save";
+    }else{
+      createButton.innerText = "Create";
+    }
+    
+
     createButton.onclick = function () {
-      if (editTaskBool) {
-        //we edit the task
-        updateTaskOnDB(cardSection);
-
-      } else {
-        postTask();
+      if (!editTaskBool && (!titleInput.value || !descriptionInput.value)) {
+        //alert("Please fill in both the title and description.");
+        descriptionInput.classList.add("create-task-input-error");
+        titleInput.classList.add("create-task-input-error");
+      }else{
+        if (editTaskBool) {
+          //we edit the task
+          updateTaskOnDB(cardSection);
+            
+        } else {
+          postTask();
+        }
+        backdrop.remove();
       }
-      backdrop.remove();
-
+      
     }
     sec.appendChild(createButton);
 

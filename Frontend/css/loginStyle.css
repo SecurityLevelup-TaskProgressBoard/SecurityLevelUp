@@ -6,8 +6,16 @@ h1{
     font-weight: 700;
 }
 
+h2 {
+    text-align: center;
+    width: 100%; 
+    margin: 1rem 0; 
+    color: #333;
+    font-size: inherit;
+}
+
 body {
-    background-image: url("../assets/pattern.png");
+    background-image: url("../assets/Group 65.png");
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -49,6 +57,7 @@ body {
     background-color: #7CB0B7;
     color: white;
     transition: width 0.3s ease; /* Smooth resizing */
+    cursor: pointer;
 }
 
 .login-button:hover{
