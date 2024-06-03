@@ -78,7 +78,7 @@ namespace Server
 				app.UseSwaggerUI();
 			}
 
-			app.UseHttpsRedirection();
+			// app.UseHttpsRedirection(); // dont need this because HTTP comms between ec2 and CF -- CF https --> end user
 			app.UseCors();
 			app.UseCors("AllowSpecificOrigin");
 			app.UseAuthentication(); // Ensure this comes before UseAuthorization
