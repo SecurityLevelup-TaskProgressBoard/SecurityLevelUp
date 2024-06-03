@@ -10,9 +10,9 @@ const API_URL = 'https://d2w0hjrwcifnrg.cloudfront.net/'; //"http://api.taskify.
 // ============== Config ================
 var uid = 1; // TODO: Get the correct user ID and remove hardcode from loadTasks function
 
-const isDev = false; // TODO: change this if you are testing to `true`
+const isDev = true; // TODO: change this if you are testing to `true`
 
-const loginPath = isDev ? 'https://localhost:5500/Frontend/login.html' : LOGIN_PATH;
+const loginPath = isDev ? 'https://localhost:5500/login.html' : LOGIN_PATH;
 const apiEndpoint = isDev ? 'https://localhost:5000' : API_URL;
 
 
@@ -295,7 +295,6 @@ async function postTask() {
     deleted: false,
   };
   try {
-    debugger;
     const response = await fetchWithAuth(`ProgressBoard/AddTask`, {
       method: "POST",
       headers: {
@@ -330,7 +329,6 @@ async function updateTaskOnDB(cardSection) {
     NewName: title
   };
   try {
-    debugger;
     const response = await fetchWithAuth(`ProgressBoard/UpdateTask`, {
       method: "PUT",
       headers: {
@@ -354,7 +352,6 @@ async function updateTaskOnDB(cardSection) {
 // We could probably have used the UpdateTask function for this, but it would have required some extra logic to distiguish between a move/delete
 async function deleteTask(cardSection) {
   const taskId = parseInt(cardSection.getAttribute("taskId"));
-  debugger;
   // TODO: This should most likely require a body for extra authentication
   await fetchWithAuth(`ProgressBoard/DeleteTask/${taskId}`, {
     method: "PUT",
