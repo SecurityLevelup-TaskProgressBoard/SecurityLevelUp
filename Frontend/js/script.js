@@ -10,10 +10,10 @@ const API_URL = 'https://d2w0hjrwcifnrg.cloudfront.net/'; //"http://api.taskify.
 // ============== Config ================
 var uid = 1; // TODO: Get the correct user ID and remove hardcode from loadTasks function
 
-const isDev = true; // TODO: change this if you are testing to `true`
+const isDev = false; // TODO: change this if you are testing to `true`
 
-const loginPath = isDev ? 'https://localhost:5500/login.html' : LOGIN_PATH;
-const apiEndpoint = isDev ? 'https://localhost:5000' : API_URL;
+const loginPath = isDev ? 'http://localhost:5500/login.html' : LOGIN_PATH;
+const apiEndpoint = isDev ? 'http://localhost:5127/' : API_URL;
 
 
 function getTokens() {
