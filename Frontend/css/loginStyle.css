@@ -53,7 +53,7 @@ body {
     height: 2.5rem;
     font-weight: 400;
     font-size: larger;
-    border-style: solid;
+    /* border-style: solid; */
     background-color: #7CB0B7;
     color: white;
     transition: width 0.3s ease; /* Smooth resizing */
