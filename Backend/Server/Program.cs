@@ -5,6 +5,8 @@ using Server.Services;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
 
 namespace Server
 {
@@ -20,6 +22,7 @@ namespace Server
 		public static void Main(string[] args)
 		{
 			var builder = WebApplication.CreateBuilder(args);
+			var rateLimitingPolicyName = "fixed";
 
 			builder.Services.AddCors(options =>
 			{
@@ -29,6 +32,15 @@ namespace Server
 						.AllowAnyHeader()
 						.AllowAnyMethod());
 			});
+
+			builder.Services.AddRateLimiter(_ => _
+			.AddFixedWindowLimiter(policyName: rateLimitingPolicyName, options =>
+			{
+				options.PermitLimit = 24;
+				options.Window = TimeSpan.FromSeconds(12);
+				options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+				options.QueueLimit = 2;
+			}));
 
 			builder.Services.AddControllers();
 
@@ -72,7 +84,9 @@ namespace Server
 
 			var app = builder.Build();
 
-			if (app.Environment.IsDevelopment())
+			
+
+			if(app.Environment.IsDevelopment())
 			{
 				app.UseSwagger();
 				app.UseSwaggerUI();
@@ -83,16 +97,16 @@ namespace Server
 			app.UseCors("AllowSpecificOrigin");
 			app.UseAuthentication(); // Ensure this comes before UseAuthorization
 			app.UseAuthorization();
+			app.UseRateLimiter();
 
-
-			app.MapControllers();
+			app.MapControllers().RequireRateLimiting(rateLimitingPolicyName);
 
 			app.Run();
 
 			async Task<JsonWebKeySet> GetJsonWebKeySetAsync()
 			{
 				var authority = Environment.GetEnvironmentVariable("Cognito_Authority");
-				using (var httpClient = new HttpClient())
+				using(var httpClient = new HttpClient())
 				{
 					var response = await httpClient.GetStringAsync($"{authority}/.well-known/jwks.json");
 					return new JsonWebKeySet(response);
