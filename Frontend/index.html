@@ -18,22 +18,28 @@
   <body>
     <section class="new-task-section" id="new-task-section">
       <h1>My Tasks</h1>
-      <button class="new-task-button" id="new-task-button">New Task</button>
+      <section>
+        <button class="new-task-button" id="new-task-button">New Task</button>
+        <button class="new-task-button" id="logout-button">Logout</button>
+      </section>
     </section>
 
     <section id="board-container" class="board-container">
       <section id="to-do-board" class="board">
-        <h2 class="board-heading">ToDo</h2>
+        <h2 class="board-heading">To Do:</h2>
       </section>
 
       <section id="in-progress-board" class="board">
-        <h2 class="board-heading">In Progress</h2>
+        <h2 class="board-heading">In Progress:</h2>
       </section>
 
       <section id="done-board" class="board">
-        <h2 class="board-heading">Done</h2>
+        <h2 class="board-heading">Done:</h2>
       </section>
     </section>
+    
+    <section id="loading-element" class="loading-element">Loading...</section>
+
 
     <!-- <button onclick="destroyBoard()">destroy board</button>
     <button onclick="buildBoard()">build board</button> -->
