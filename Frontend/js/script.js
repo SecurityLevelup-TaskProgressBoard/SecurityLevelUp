@@ -10,7 +10,7 @@ document.getElementById('logout-button').addEventListener('click', function () {
 });
 
 // ============== Config ================
-var uid = 1; // TODO: Get the correct user ID and remove hardcode from loadTasks function
+var uid = 1;
 
 const loginPath = LOGIN_PATH;
 const apiEndpoint = API_URL;
@@ -41,7 +41,7 @@ function getTokens() {
   }
 }
 
-//this checks to see if the token has expired or not, if so it redirects to login
+// This checks to see if the token has expired or not, if so it redirects to login
 function checkToken() {
   let token = sessionStorage.getItem('idToken');
 
@@ -62,7 +62,6 @@ function checkToken() {
   // Check if the token has expired
   if (currentTime >= expirationTime) {
     // Token has expired, redirect to login
-
     const params = new URLSearchParams();
     params.append('expired', 'true');
     const loginUrlWithParams = `${loginPath}?${params.toString()}`;
@@ -88,7 +87,7 @@ window.onload = async () => {
 async function fetchWithAuth(endpoint, options = {}) {
   checkToken();
   const headers = new Headers(options.headers || {});
-  //added the token part 
+
   const token = sessionStorage.getItem('idToken');
   if (token) {
     headers.set('Authorization', `Bearer ${token}`);
@@ -107,7 +106,6 @@ async function fetchWithAuth(endpoint, options = {}) {
   } else return result;
 }
 
-// This will become async once we call the endpoint in here to get all the user's tasks
 async function loadTasks() {
   let userTitles = [];
   let userDescriptions = [];
@@ -115,7 +113,6 @@ async function loadTasks() {
   let userStatus = [];
   let userTaskIds = [];
 
-  // TODO: Get the actual user id
   let response = await fetchWithAuth(`ProgressBoard/UserTasks`);
   let tasks = await response.json();
   for (var task of tasks) {
@@ -137,7 +134,7 @@ async function buildBoard() {
   for (let index = 0; index < userTaskIds.length; index++) {
     const sec = document.createElement("section");
     sec.classList.add("card");
-    sec.id = "card-" + String(userTaskIds[index]); // Will use later when moving and deleting
+    sec.id = "card-" + String(userTaskIds[index]);
     sec.setAttribute("taskId", userTaskIds[index]);
 
     const headerSection = document.createElement('section');
@@ -199,10 +196,9 @@ async function buildBoard() {
 
     const btnMove = document.createElement('button');
     btnMove.classList.add('card-button');
-    btnMove.id = 'move-button-' + String(userTaskIds[index]); // This is a bit redundant but might be useful later
+    btnMove.id = 'move-button-' + String(userTaskIds[index]);
     btnMove.innerText = 'Advance';
     btnMove.onclick = function () { 
-      //moveTask(document.getElementById('card-' + String(userTaskIds[index]))); 
 
       btnMove.disabled = true;
       try {
@@ -217,7 +213,6 @@ async function buildBoard() {
 
     sec.appendChild(dateSection);
 
-    // Append the card to the relevant board section via its Status (derived from boardId in Tasks table, then Status in Boards table)
     switch (userStatus[index]) {
       case "TODO":
         sec.setAttribute("boardId", "TODO");
@@ -258,7 +253,6 @@ async function moveTask(cardSection) {
   let jsonData = {};
   switch (boardId) {
     case "TODO":
-      // Update the boardId in the 'Tasks' table from 1 to 2
       jsonData = { taskId: taskId, newStatus: "IN PROGRESS" };
       break;
     case "IN PROGRESS":
@@ -333,7 +327,6 @@ async function postTask() {
 
 function validateInput(input){
   input = input.toUpperCase();
-  console.log(input);
   // Check for basic injection commands
   for (let keyword of injectionKeywords){
     if (input.includes(keyword.toUpperCase())) return false;
@@ -342,7 +335,6 @@ function validateInput(input){
   for (let keyword of injectionCharacters){
     if (input.includes(keyword.toUpperCase())) return false;
   }
-
   return true;
 }
 
@@ -392,14 +384,11 @@ async function updateTaskOnDB(cardSection) {
 // We could probably have used the UpdateTask function for this, but it would have required some extra logic to distiguish between a move/delete
 async function deleteTask(cardSection) {
   const taskId = parseInt(cardSection.getAttribute("taskId"));
-  // TODO: This should most likely require a body for extra authentication
   await fetchWithAuth(`ProgressBoard/DeleteTask/${taskId}`, {
     method: "PUT",
   });
 
-  // Destroy the board
   destroyBoard();
-  // Reload the board from the DB with the now updated boardId in the Tasks table (which we did in the switch)
   buildBoard();
 }
 
@@ -544,7 +533,6 @@ function NewTaskClicked(editTaskBool, cardSection) {
 
     createButton.onclick = function () {
       if (!editTaskBool && (!titleInput.value || !descriptionInput.value)) {
-        //alert("Please fill in both the title and description.");
         if(!titleInput.value){
           titleInput.classList.add("create-task-input-error");
         }
@@ -577,9 +565,8 @@ function NewTaskClicked(editTaskBool, cardSection) {
 }
 
 function LogMeOut(){
-  // sessionStorage.setItem('idToken', '');
-  // sessionStorage.setItem('accessToken', '');
-
-  window.location.href = loginPath;
+  const url = "https://taskify-secuirty.auth.eu-west-1.amazoncognito.com/logout?client_id=66lc4rli2hjagrads5atsjbumg&logout_uri=http://localhost:5500";
+  sessionStorage.clear();
+  window.location.href = url;
   return;
 }
