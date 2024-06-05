@@ -30,6 +30,11 @@ jobs:
           role-to-assume: ${{secrets.AWS_SECRET_ASSUME_ROLE}}
           role-session-name: federatedOIDC-GH-AWS
           aws-region: ${{secrets.AWS_SECRET_REGION}}
+      
+      - name: Inject config file
+        working-directory: ${{ env.web_directory }}
+        run: |
+          aws ssm get-parameter --name "tpb-web-config" --with-decryption --query 'Parameter.Value' --region ${{secrets.AWS_SECRET_REGION}} --output text > ./js/config.js
 
       - name: Deploy Fronted Files
         working-directory: ${{ env.web_directory }}
