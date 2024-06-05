@@ -13,7 +13,6 @@ services:
     volumes:
       - sql-server-data:/var/opt/mssql
       - ./docker_db_init.sql:/docker_db_init.sql
-    # entrypoint: /bin/bash -c "/opt/mssql/bin/sqlservr & sleep 10 & /opt/mssql-tools/bin/sqlcmd -S localhost,1433 -U sa -P redTeam123 -i /docker_db_init.sql"
 
   backend:
     build:

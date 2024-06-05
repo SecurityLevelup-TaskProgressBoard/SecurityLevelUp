@@ -34,6 +34,3 @@ INSERT INTO Boards VALUES
 ('IN PROGRESS'),
 ('DONE');
 GO
-
-USE master;
-GO
