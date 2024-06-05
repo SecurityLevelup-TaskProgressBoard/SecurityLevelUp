@@ -1,4 +1,4 @@
-import { LOGIN_PATH, API_URL } from "./config.js";
+import { LOGIN_PATH, API_URL, logOutURL } from "./config.js";
 
 var HasNewTaskBeenClicked = 0;
 
@@ -125,8 +125,15 @@ async function loadTasks() {
   return { userTitles, userDescriptions, userDates, userStatus, userTaskIds };
 }
 
+function isMobile() {
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    return /android|avantgo|blackberry|bada\/|bb10|blazer|compal|elaine|fennec|hiptop|iemobile|ipad|iphone|ipod|iris|kindle|lge |maemo|midp|mmp|mobile|netfront|nokia|opera mini|opera mobi|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(userAgent);
+  }
+
 async function buildBoard() {
   destroyBoard();
+  const loadingElement = document.getElementById("loading-element");
+  loadingElement.style.display = "block"; 
 
   // Load all tasks
   let { userTitles, userDescriptions, userDates, userStatus, userTaskIds } = await loadTasks();
@@ -134,7 +141,11 @@ async function buildBoard() {
   for (let index = 0; index < userTaskIds.length; index++) {
     const sec = document.createElement("section");
     sec.classList.add("card");
-    sec.id = "card-" + String(userTaskIds[index]);
+
+    if(!isMobile()){
+        sec.setAttribute('draggable', 'true');
+    }
+    sec.id = "card-" + String(userTaskIds[index]); // Will use later when moving and deleting
     sec.setAttribute("taskId", userTaskIds[index]);
 
     const headerSection = document.createElement('section');
@@ -169,7 +180,9 @@ async function buildBoard() {
     btnDelete.id = 'delete-button-' + String(userTaskIds[index]);
     btnDelete.innerText = 'Delete';
     btnDelete.onclick = function () {
-      deleteTask(document.getElementById("card-" + String(userTaskIds[index])));
+        btnDelete.disabled = true;
+        deleteTask(document.getElementById("card-" + String(userTaskIds[index])));
+        sec.remove();
     };
 
     menu.appendChild(btnEdit);
@@ -234,6 +247,7 @@ async function buildBoard() {
         break;
     }
   }
+  loadingElement.style.display = "none";
 }
 
 function editTask(cardSection) {
@@ -247,19 +261,99 @@ function editTask(cardSection) {
   taskDescriptionField.value = cardSection.getAttribute("description");
 }
 
+let draggedElement = null;
+
+document.addEventListener('dragstart', function(event) {
+  draggedElement = event.target;
+  event.dataTransfer.setData('text/plain', draggedElement.id);
+  
+});
+
+document.addEventListener('dragover', function(event) {
+  event.preventDefault();
+});
+
+document.addEventListener('drop', async function(event) {
+    event.preventDefault();
+    if (event.target.classList.contains('board')) {
+        const taskId = draggedElement.getAttribute('taskid');
+        const newBoardId = event.target.getAttribute('id');
+
+        // Update the boardId attribute of the dragged element to reflect the new board
+        let newStatus;
+        let jsonData;
+        switch (newBoardId) {
+            case "to-do-board":
+                newStatus = "TODO";
+                jsonData = { taskId: taskId, newStatus: "TODO" };
+                break;
+            case "in-progress-board":
+                newStatus = "IN PROGRESS";
+                jsonData = { taskId: taskId, newStatus: "IN PROGRESS" };
+                break;
+            case "done-board":
+                newStatus = "DONE";
+                jsonData = { taskId: taskId, newStatus: "DONE" };
+                break;
+            default:
+                newStatus = draggedElement.getAttribute('boardid');
+                break;
+        }
+
+        draggedElement.setAttribute('boardid', newStatus);
+
+        // Append the card to the target board
+        event.target.appendChild(draggedElement);
+        const button = draggedElement.querySelector('.card-button');
+        switch (newStatus) {
+            case "TODO":
+                button.textContent = "Advance";
+                break;
+            case "IN PROGRESS":
+                button.textContent = "Advance";
+                break;
+            case "DONE":
+                button.textContent = "Reopen";
+                break;
+        }
+
+        // Call moveTask to update the task in the database
+        //await moveTask(draggedElement);
+        try {
+            const response = await fetchWithAuth(`ProgressBoard/UpdateTask`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(jsonData),
+            });
+            if (!response.ok) {
+              throw new Error("API error: " + response.text());
+            }
+          } catch (err) {
+            throw new Error("Frontend error: " + err.message);
+          }
+        
+
+        draggedElement = null;
+    }
+});
+
+
 async function moveTask(cardSection) {
   const taskId = parseInt(cardSection.getAttribute("taskId"));
   const boardId = cardSection.getAttribute("boardId");
   let jsonData = {};
   switch (boardId) {
     case "TODO":
-      jsonData = { taskId: taskId, newStatus: "IN PROGRESS" };
+      // Update the boardId in the 'Tasks' table from 1 to 2
+      jsonData = { taskId: taskId, newStatus: "TODO" };
       break;
     case "IN PROGRESS":
-      jsonData = { taskId: taskId, newStatus: "DONE" };
+      jsonData = { taskId: taskId, newStatus: "IN PROGRESS" };
       break;
     case "DONE":
-      jsonData = { taskId: taskId, newStatus: "TODO" };
+      jsonData = { taskId: taskId, newStatus: "DONE" };
       break;
     default:
       break;
@@ -292,9 +386,10 @@ async function postTask() {
   if (title == "" || description == "") {
     return;
   }
-  if (!validateInput(title) || !validateInput(description)) {
-    return;
-  }
+
+  const loadingElement = document.getElementById("loading-element");
+  loadingElement.style.display = "block"; 
+
   let jsonData = {
     taskId: 0,
     userId: uid,
@@ -317,6 +412,8 @@ async function postTask() {
     }
   } catch (err) {
     throw new Error("Frontend error: " + err.message);
+  }finally {
+    loadingElement.style.display = "none"; // Hide the loading element
   }
 
   // Destroy the board
@@ -355,6 +452,9 @@ async function updateTaskOnDB(cardSection) {
   if (title == "" || description == "") {
     return;
   }
+  const loadingElement = document.getElementById("loading-element");
+  loadingElement.style.display = "block"; 
+
   let jsonData = {
     TaskId: taskId,
     NewDescription: description,
@@ -373,6 +473,8 @@ async function updateTaskOnDB(cardSection) {
     }
   } catch (err) {
     throw new Error("Frontend error: " + err.message);
+  }finally {
+    loadingElement.style.display = "none"; // Hide the loading element
   }
 
   // Destroy the board
@@ -388,8 +490,11 @@ async function deleteTask(cardSection) {
     method: "PUT",
   });
 
-  destroyBoard();
-  buildBoard();
+  //commented these out becasue then we dont get delay
+  // Destroy the board
+  //destroyBoard();
+  // Reload the board from the DB with the now updated boardId in the Tasks table (which we did in the switch)
+ // buildBoard();
 }
 
 function destroyBoard() {
@@ -565,7 +670,7 @@ function NewTaskClicked(editTaskBool, cardSection) {
 }
 
 function LogMeOut(){
-  const url = "https://taskify-secuirty.auth.eu-west-1.amazoncognito.com/logout?client_id=66lc4rli2hjagrads5atsjbumg&logout_uri=http://localhost:5500";
+  const url = logOutURL;
   sessionStorage.clear();
   window.location.href = url;
   return;
