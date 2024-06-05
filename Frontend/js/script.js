@@ -5,13 +5,17 @@ var HasNewTaskBeenClicked = 0;
 document.getElementById('new-task-button').addEventListener('click', function () {
   NewTaskClicked(false, null);
 });
+document.getElementById('logout-button').addEventListener('click', function () {
+  LogMeOut();
+});
 
 // ============== Config ================
 var uid = 1; // TODO: Get the correct user ID and remove hardcode from loadTasks function
 
 const loginPath = LOGIN_PATH;
 const apiEndpoint = API_URL;
-
+const injectionKeywords = ['DROP', 'ALTER', 'INNER', 'JOIN', 'DELETE', 'UNION', 'FETCH', 'DELCARE', 'TABLE', 'Tasks', 'Boards', 'Users', 'UserId', 'TaskId', 'BoardId', 'Deleted', 'script'];
+const injectionCharacters = ['=', '--', ';', '*', '\\', '<', '>'];
 
 function getTokens() {
   // Check if tokens are in the URL fragment
@@ -288,8 +292,13 @@ async function moveTask(cardSection) {
 
 async function postTask() {
   const title = document.getElementById("title-input").value;
+  if (title.length > 50) return;
   const description = document.getElementById("description-input").value;
+  if (description.length > 200) return;
   if (title == "" || description == "") {
+    return;
+  }
+  if (!validateInput(title) || !validateInput(description)) {
     return;
   }
   let jsonData = {
@@ -322,10 +331,34 @@ async function postTask() {
   buildBoard();
 }
 
+function validateInput(input){
+  input = input.toUpperCase();
+  console.log(input);
+  // Check for basic injection commands
+  for (let keyword of injectionKeywords){
+    if (input.includes(keyword.toUpperCase())) return false;
+  }
+  // Check for characters commonly used in injections
+  for (let keyword of injectionCharacters){
+    if (input.includes(keyword.toUpperCase())) return false;
+  }
+
+  return true;
+}
+
 async function updateTaskOnDB(cardSection) {
   const title = document.getElementById("title-input").value;
-  const description = document.getElementById("description-input").value;
   const taskId = parseInt(cardSection.getAttribute("taskId"));
+  if (title.length > 50) return;
+
+  const description = document.getElementById("description-input").value;
+  if (description.length > 200) return;
+  if (title == "" || description == "") {
+    return;
+  }
+  if (!validateInput(title) || !validateInput(description)) {
+    return;
+  }
 
   if (title == "" || description == "") {
     return;
@@ -489,7 +522,7 @@ function NewTaskClicked(editTaskBool, cardSection) {
     descriptionInput.placeholder = "Description";
     descriptionInput.type = "text";
     descriptionInput.autocomplete = "off";
-    descriptionInput.maxLength = "300";
+    descriptionInput.maxLength = "200";
 
     // Conditionally set the required attribute
     if (!editTaskBool) {
@@ -543,3 +576,10 @@ function NewTaskClicked(editTaskBool, cardSection) {
   }
 }
 
+function LogMeOut(){
+  // sessionStorage.setItem('idToken', '');
+  // sessionStorage.setItem('accessToken', '');
+
+  window.location.href = loginPath;
+  return;
+}
