@@ -119,12 +119,18 @@
     overflow: hidden;
 }
  
-.title-input,
 .description-input,
 .card-button {
     margin: 0.5rem 0;
     padding: 0.5rem;
 }
+
+/* .title-input{
+    width: 100%;
+    box-sizing: border-box; 
+    margin: 0.5rem 0;
+    padding: 0.5rem;
+} */
 
 .new-task-section {
     display: flex;
@@ -168,6 +174,8 @@
     font-weight: bolder;
     background-color: #EEF2F4;
     border-radius: 0.5rem;
+    margin: 0.5rem 0;
+    padding: 0.5rem;
 }
 
 .title-input::placeholder {
@@ -190,7 +198,6 @@
     border-radius: 0.25rem;
     color: #555;
     overflow: auto;
-    resize: none;
     font-weight: bolder;
     background-color: #EEF2F4;
     border-radius: 0.5rem;
@@ -351,10 +358,12 @@
     display: none;
 }
 
-.db-error{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.db-error-container{
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     background-color: #ffffff;
     width: 30%;
     height: 10rem;
@@ -364,7 +373,14 @@
     border-style: solid;
     border-color: #7cb0b7;
     box-shadow: 0px 0px 2px #6c6c6c;
-    display: none;
+    
+    z-index: 1000;
+}
+
+.db-error{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .db-error-button{

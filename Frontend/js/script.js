@@ -109,7 +109,7 @@ async function fetchWithAuth(endpoint, options = {}) {
     params.append('unauthorized', 'true');
     const loginUrlWithParams = `${loginPath}?${params.toString()}`;
     window.location.href = loginUrlWithParams;
-  } else if(result.status == 400) {
+  } else if(result.status == 400 || result.status == 404) {
     //display UI here
     popUp.style.display = "block";
 
@@ -598,11 +598,10 @@ function NewTaskClicked(editTaskBool, cardSection) {
     titleSectionName.innerText = "Task name";
     titleSection.appendChild(titleSectionName);
 
-    const titleInput = document.createElement("input");
+    const titleInput = document.createElement("textarea");
     titleInput.classList.add("title-input");
     titleInput.id = "title-input";
     titleInput.placeholder = "Enter task title";
-    titleInput.type = "text";
     titleInput.autocomplete = "off";
     titleInput.maxLength = "50";
 
@@ -622,11 +621,10 @@ function NewTaskClicked(editTaskBool, cardSection) {
     descriptionSectionName.innerText = "Task description";
     descriptionSection.appendChild(descriptionSectionName);
 
-    const descriptionInput = document.createElement("input");
+    const descriptionInput = document.createElement("textarea");
     descriptionInput.classList.add("description-input");
     descriptionInput.id = "description-input";
     descriptionInput.placeholder = "Description";
-    descriptionInput.type = "text";
     descriptionInput.autocomplete = "off";
     descriptionInput.maxLength = "200";
 
