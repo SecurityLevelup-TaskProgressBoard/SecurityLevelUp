@@ -3,6 +3,7 @@ version: '3.8'
 services:
   sql-server:
     image: mcr.microsoft.com/mssql/server:latest
+    container_name: securitylevelup-sql-server-1
     environment:
       ACCEPT_EULA: Y
       SA_PASSWORD: redTeam123
