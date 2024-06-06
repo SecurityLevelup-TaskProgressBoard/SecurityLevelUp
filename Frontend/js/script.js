@@ -11,11 +11,17 @@ document.getElementById('logout-button').addEventListener('click', function () {
 
 // ============== Config ================
 var uid = 1;
+let popUp = document.getElementById('db-error-pop-up');
+let popUpButton = document.getElementById('db-error-button');
 
 const loginPath = LOGIN_PATH;
 const apiEndpoint = API_URL;
 const injectionKeywords = ['DROP', 'ALTER', 'INNER', 'JOIN', 'DELETE', 'UNION', 'FETCH', 'DELCARE', 'TABLE', 'script'];
 const injectionCharacters = ['=', '--', ';', '*', '\\', '<', '>'];
+
+popUpButton.addEventListener('click', function(){
+  popUp.style.display = "none";
+});
 
 function getTokens() {
   // Check if tokens are in the URL fragment
@@ -103,7 +109,13 @@ async function fetchWithAuth(endpoint, options = {}) {
     params.append('unauthorized', 'true');
     const loginUrlWithParams = `${loginPath}?${params.toString()}`;
     window.location.href = loginUrlWithParams;
-  } else return result;
+  } else if(result.status == 400 || result.status == 404) {
+    //display UI here
+    popUp.style.display = "block";
+
+  } else if(result.status == 200){
+    return result
+  };
 }
 
 async function loadTasks() {
@@ -347,13 +359,13 @@ async function moveTask(cardSection) {
   switch (boardId) {
     case "TODO":
       // Update the boardId in the 'Tasks' table from 1 to 2
-      jsonData = { taskId: taskId, newStatus: "TODO" };
-      break;
-    case "IN PROGRESS":
       jsonData = { taskId: taskId, newStatus: "IN PROGRESS" };
       break;
-    case "DONE":
+    case "IN PROGRESS":
       jsonData = { taskId: taskId, newStatus: "DONE" };
+      break;
+    case "DONE":
+      jsonData = { taskId: taskId, newStatus: "TODO" };
       break;
     default:
       break;
@@ -586,11 +598,10 @@ function NewTaskClicked(editTaskBool, cardSection) {
     titleSectionName.innerText = "Task name";
     titleSection.appendChild(titleSectionName);
 
-    const titleInput = document.createElement("input");
+    const titleInput = document.createElement("textarea");
     titleInput.classList.add("title-input");
     titleInput.id = "title-input";
     titleInput.placeholder = "Enter task title";
-    titleInput.type = "text";
     titleInput.autocomplete = "off";
     titleInput.maxLength = "50";
 
@@ -610,11 +621,10 @@ function NewTaskClicked(editTaskBool, cardSection) {
     descriptionSectionName.innerText = "Task description";
     descriptionSection.appendChild(descriptionSectionName);
 
-    const descriptionInput = document.createElement("input");
+    const descriptionInput = document.createElement("textarea");
     descriptionInput.classList.add("description-input");
     descriptionInput.id = "description-input";
     descriptionInput.placeholder = "Description";
-    descriptionInput.type = "text";
     descriptionInput.autocomplete = "off";
     descriptionInput.maxLength = "200";
 
