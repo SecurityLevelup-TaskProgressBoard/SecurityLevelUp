@@ -78,6 +78,7 @@
     margin-right: 2%; */
     overflow: auto;
     font-size: small;
+    overflow-wrap: anywhere;
 }
 
 .card-button{
@@ -248,9 +249,12 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
 
     border-bottom: 1px solid #ccc;
+}
+
+.card-header h2{
+    overflow-wrap: anywhere;
 }
 
 .date-section{
