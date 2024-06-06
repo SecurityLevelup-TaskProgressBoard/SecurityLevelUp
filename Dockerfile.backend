@@ -1,0 +1,16 @@
+FROM mcr.microsoft.com/dotnet/sdk:latest AS build
+
+ENV DB_CONNECTION_STRING="Server=securitylevelup-sql-server-1,1433;Initial Catalog=taskifydb;User ID=sa;Password=redTeam123;TrustServerCertificate=True;"
+
+ENV Cognito_UserPoolId="eu-west-1_PxnrTbF9l"
+ENV Cognito_ClientId="66lc4rli2hjagrads5atsjbumg"
+ENV Cognito_Authority="https://cognito-idp.eu-west-1.amazonaws.com/eu-west-1_PxnrTbF9l"
+
+WORKDIR /app
+COPY ./Backend/Server .
+COPY ./docker_db_init.sql .
+RUN dotnet build -c Release -o /app/build
+
+EXPOSE 5000
+
+CMD ["dotnet", "/app/build/Server.dll"]

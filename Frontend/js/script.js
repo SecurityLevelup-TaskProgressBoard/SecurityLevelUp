@@ -16,7 +16,7 @@ let popUpButton = document.getElementById('db-error-button');
 
 const loginPath = LOGIN_PATH;
 const apiEndpoint = API_URL;
-const injectionKeywords = ['DROP', 'ALTER', 'INNER', 'JOIN', 'DELETE', 'UNION', 'FETCH', 'DELCARE', 'TABLE', 'Tasks', 'Boards', 'Users', 'UserId', 'TaskId', 'BoardId', 'Deleted', 'script'];
+const injectionKeywords = ['DROP', 'ALTER', 'INNER', 'JOIN', 'DELETE', 'UNION', 'FETCH', 'DELCARE', 'TABLE', 'script'];
 const injectionCharacters = ['=', '--', ';', '*', '\\', '<', '>'];
 
 popUpButton.addEventListener('click', function(){
