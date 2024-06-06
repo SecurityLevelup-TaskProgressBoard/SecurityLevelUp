@@ -51,7 +51,7 @@ else
 fi
 echo "Waiting for SQL Server..."
 loading_chars=(". " "/ " "- " "\\ ")
-duration=10
+duration=20
 start_time=$(date +%s)
 while [ $(($(date +%s) - start_time)) -lt $duration ]; do
   for char in "${loading_chars[@]}"; do
